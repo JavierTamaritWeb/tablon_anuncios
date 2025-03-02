@@ -32,6 +32,11 @@
       justify-content: center;
       margin-bottom: 1.5rem;
     }
+    /* Contenedor para el control de fecha con botón de limpiar */
+    .tablon-anuncios__controles-fecha-wrapper {
+      position: relative;
+      display: inline-block;
+    }
     .tablon-anuncios__controles-select,
     .tablon-anuncios__controles-fecha {
       padding: 0.75rem 1rem;
@@ -40,13 +45,28 @@
       border-radius: 5px;
       background-color: #FFFFFF; /* blanco */
       color: #333;
-      transition: background-color 0.3s ease;
-      transition: color 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
     .tablon-anuncios__controles-select:hover,
     .tablon-anuncios__controles-fecha:hover {
       background-color: black;
       color: white;
+    }
+    /* Botón para limpiar la fecha */
+    .tablon-anuncios__controles-fecha-borrar {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      color: #333;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    .tablon-anuncios__controles-fecha-borrar:hover {
+      color: #FF6F61;
     }
     /* ===== LISTA DE ANUNCIOS ===== */
     .tablon-anuncios__lista {
@@ -136,7 +156,6 @@
       }
       .tablon-anuncios__item-meta {
         font-size: 1rem;
-        
       }
     }
   </style>
@@ -153,7 +172,10 @@
         <option value="Información">Información</option>
         <option value="Recordatorio">Recordatorio</option>
       </select>
-      <input type="date" class="tablon-anuncios__controles-fecha" id="filtro-fecha">
+      <div class="tablon-anuncios__controles-fecha-wrapper">
+        <input type="date" class="tablon-anuncios__controles-fecha" id="filtro-fecha">
+        <button class="tablon-anuncios__controles-fecha-borrar" id="borrar-fecha">✕</button>
+      </div>
     </div>
     <div class="tablon-anuncios__lista" id="lista-anuncios">
       <!-- Los anuncios se cargarán dinámicamente -->
@@ -217,6 +239,7 @@
       const todosLosAnuncios = await cargarAnuncios();
       const filtroCategoria = document.getElementById('filtro-categoria');
       const filtroFecha = document.getElementById('filtro-fecha');
+      const botonBorrarFecha = document.getElementById('borrar-fecha');
 
       function aplicarFiltros() {
         const categoriaSeleccionada = filtroCategoria.value;
@@ -231,6 +254,10 @@
       // Asigna eventos a los filtros
       filtroCategoria.addEventListener('change', aplicarFiltros);
       filtroFecha.addEventListener('change', aplicarFiltros);
+      botonBorrarFecha.addEventListener('click', () => {
+        filtroFecha.value = '';
+        aplicarFiltros();
+      });
     }
 
     document.addEventListener('DOMContentLoaded', iniciarAnuncios);
