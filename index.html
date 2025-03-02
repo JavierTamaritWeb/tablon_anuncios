@@ -3,63 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tablón de Anuncios - Falla Suïssa</title>
+  <title>Calendario de Eventos - Falla Suïssa</title>
   <style>
-    /* ===== BLOQUE: tablon-anuncios ===== */
-    .tablon-anuncios {
+    /* ==========================
+       BLOQUE: calendario-eventos
+       ========================== */
+    .calendario-eventos {
       max-width: 900px;
       margin: 2rem auto;
       padding: 2rem;
       background-color: #fdf2e9; /* naranja-suave */
       border: 1px solid #fdfdfd;  /* blanco-sutil-gris */
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      font-family: Arial, sans-serif;
     }
-    .tablon-anuncios__cabecera {
+    .calendario-eventos__cabecera {
       text-align: center;
       margin-bottom: 1.5rem;
     }
-    .tablon-anuncios__cabecera-titulo {
+    .calendario-eventos__cabecera-titulo {
       font-size: 2.5rem;
       color: #FF6F61; /* primary-color */
       margin: 0;
     }
-    /* ===== CONTROLES ===== */
-    .tablon-anuncios__controles {
+    /* ===== CONTROLES DE FILTRO ===== */
+    .calendario-eventos__controles {
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
       justify-content: center;
       margin-bottom: 1.5rem;
     }
-    /* Contenedor para el control de fecha y el botón de borrar */
-    .tablon-anuncios__controles-fecha-wrapper {
-      position: relative;
-      display: inline-block;
+    /* Cada control se agrupa en un contenedor */
+    .calendario-eventos__control {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #333;
     }
-    .tablon-anuncios__controles-select,
-    .tablon-anuncios__controles-fecha {
+    .calendario-eventos__control label {
+      margin-bottom: 0.3rem;
+    }
+    .calendario-eventos__control-select,
+    .calendario-eventos__control-fecha,
+    .calendario-eventos__control-busqueda {
       padding: 0.75rem 1rem;
       font-size: 1rem;
-      border: 1px solid #333; /* secondary-color */
+      border: 1px solid #333;
       border-radius: 5px;
-      background-color: #FFFFFF; /* blanco */
+      background-color: #fff;
       color: #333;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-    /* Aumentamos el padding-right en el input de fecha para dejar espacio para la "X" */
-    .tablon-anuncios__controles-fecha {
+    .calendario-eventos__control-select:hover,
+    .calendario-eventos__control-fecha:hover,
+    .calendario-eventos__control-busqueda:hover {
+      background-color: black;
+      color: white;
+    }
+    /* Contenedor para el input de fecha con botón de limpiar */
+    .calendario-eventos__control-fecha-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+    .calendario-eventos__control-fecha {
       padding-right: 3rem;
     }
-    /* Ajuste para navegadores WebKit: reposicionar el icono nativo del calendario */
-    .tablon-anuncios__controles-fecha::-webkit-calendar-picker-indicator {
+    .calendario-eventos__control-fecha::-webkit-calendar-picker-indicator {
       position: absolute;
       right: 2.5rem;
       cursor: pointer;
       transition: filter 0.3s ease;
     }
-    /* Botón para borrar la fecha */
-    .tablon-anuncios__controles-fecha-borrar {
+    .calendario-eventos__control-fecha-wrapper:hover .calendario-eventos__control-fecha::-webkit-calendar-picker-indicator {
+      filter: invert(100%);
+    }
+    .calendario-eventos__control-fecha-borrar {
       position: absolute;
       right: 0.5rem;
       top: 50%;
@@ -71,213 +92,348 @@
       cursor: pointer;
       transition: color 0.3s ease;
     }
-    .tablon-anuncios__controles-fecha-borrar:hover {
-      color: #FF6F61;
-    }
-    /* Al hacer hover sobre el contenedor de fecha, todos los elementos internos cambian */
-    .tablon-anuncios__controles-fecha-wrapper:hover .tablon-anuncios__controles-fecha {
-      background-color: black;
+    .calendario-eventos__control-fecha-wrapper:hover .calendario-eventos__control-fecha-borrar {
       color: white;
     }
-    .tablon-anuncios__controles-fecha-wrapper:hover .tablon-anuncios__controles-fecha::-webkit-calendar-picker-indicator {
-      filter: invert(100%);
+    /* ===== VISTA DEL CALENDARIO ===== */
+    .calendario-eventos__vista {
+      margin-top: 2rem;
     }
-    .tablon-anuncios__controles-fecha-wrapper:hover .tablon-anuncios__controles-fecha-borrar {
-      color: white;
-    }
-    /* ===== LISTA DE ANUNCIOS ===== */
-    .tablon-anuncios__lista {
+    .calendario-eventos__grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
     }
-    /* ===== ITEM (ANUNCIO) ===== */
-    .tablon-anuncios__item {
-      background-color: #FFFFFF;
-      border: 1px solid #fdfdfd;
-      border-radius: 8px;
-      padding: 1.5rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .tablon-anuncios__item:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    }
-    .tablon-anuncios__item-titulo {
-      font-size: 1.5rem;
-      margin-bottom: 0.75rem;
-      color: #FF6F61;
-    }
-    .tablon-anuncios__item-contenido {
-      font-size: 1rem;
-      margin-bottom: 1rem;
+    /* Celda de la cabecera de la semana */
+    .calendario-eventos__celda-cabecera {
+      text-align: center;
+      font-weight: bold;
+      padding: 0.5rem;
       color: #333;
     }
-    .tablon-anuncios__item-meta {
-      font-size: 0.9rem;
-      color: #333;
-      display: flex;
-      justify-content: space-between;
+    /* Celda de un día */
+    .calendario-eventos__celda-dia {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
     }
-    /* ===== MODIFICADORES DE CATEGORÍA ===== */
-    .tablon-anuncios__item--urgente {
-      border-left: 6px solid red;
+    .calendario-eventos__celda-dia:hover {
+      background-color: #FF6F61;
+      color: white;
     }
-    .tablon-anuncios__item--informacion {
-      border-left: 6px solid #000080;
+    /* Resaltar celda con evento */
+    .calendario-eventos__celda-dia--evento {
+      background-color: #FF6F61;
+      color: white;
     }
-    .tablon-anuncios__item--recordatorio {
-      border-left: 6px solid orange;
+    /* Tooltip para detalles de evento */
+    .calendario-eventos__tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #333;
+      color: white;
+      padding: 0.5rem;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      font-size: 0.8rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
     }
-    
+    .calendario-eventos__celda-dia:hover .calendario-eventos__tooltip {
+      opacity: 1;
+    }
     /* ===== RESPONSIVIDAD ===== */
     @media (max-width: 768px) {
-      .tablon-anuncios {
+      .calendario-eventos {
         padding: 1.5rem;
         margin: 1rem;
       }
-      .tablon-anuncios__cabecera-titulo {
+      .calendario-eventos__cabecera-titulo {
         font-size: 2rem;
       }
-      .tablon-anuncios__controles-select,
-      .tablon-anuncios__controles-fecha {
-        width: 100%;
-        max-width: 300px;
+      .calendario-eventos__controles {
+        flex-direction: column;
       }
-      .tablon-anuncios__lista {
-        grid-template-columns: 1fr;
+      .calendario-eventos__grid {
+        grid-template-columns: repeat(7, 1fr);
       }
     }
     @media (max-width: 480px) {
-      .tablon-anuncios {
+      .calendario-eventos {
         padding: 1rem;
         margin: 0.5rem;
       }
-      .tablon-anuncios__cabecera-titulo {
+      .calendario-eventos__cabecera-titulo {
         font-size: 1.75rem;
       }
-      .tablon-anuncios__controles {
-        flex-direction: column;
-        align-items: center;
-      }
-      .tablon-anuncios__controles-select,
-      .tablon-anuncios__controles-fecha {
+      .calendario-eventos__control-select,
+      .calendario-eventos__control-fecha,
+      .calendario-eventos__control-busqueda {
         width: 100%;
-        max-width: none;
-      }
-      .tablon-anuncios__item-titulo {
-        font-size: 1.3rem;
-      }
-      .tablon-anuncios__item-contenido {
-        font-size: 0.9rem;
-      }
-      .tablon-anuncios__item-meta {
-        font-size: 1rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="tablon-anuncios">
-    <header class="tablon-anuncios__cabecera">
-      <h1 class="tablon-anuncios__cabecera-titulo">Tablón de Anuncios</h1>
+  <div class="calendario-eventos">
+    <header class="calendario-eventos__cabecera">
+      <h1 class="calendario-eventos__cabecera-titulo">Calendario de Eventos</h1>
     </header>
-    <div class="tablon-anuncios__controles">
-      <select class="tablon-anuncios__controles-select" id="filtro-categoria">
-        <option value="">Todas las categorías</option>
-        <option value="Urgente">Urgente</option>
-        <option value="Información">Información</option>
-        <option value="Recordatorio">Recordatorio</option>
-      </select>
-      <div class="tablon-anuncios__controles-fecha-wrapper">
-        <input type="date" class="tablon-anuncios__controles-fecha" id="filtro-fecha">
-        <button class="tablon-anuncios__controles-fecha-borrar" id="borrar-fecha">✕</button>
+    <!-- Controles de filtrado -->
+    <div class="calendario-eventos__controles">
+      <div class="calendario-eventos__control">
+        <label for="filtro-dia">Día</label>
+        <select id="filtro-dia" class="calendario-eventos__control-select">
+          <option value="">Todos</option>
+          <!-- Se llenarán del 1 al 31 -->
+        </select>
+      </div>
+      <div class="calendario-eventos__control">
+        <label for="filtro-mes">Mes</label>
+        <select id="filtro-mes" class="calendario-eventos__control-select">
+          <option value="">Todos</option>
+          <option value="1">Enero</option>
+          <option value="2">Febrero</option>
+          <option value="3">Marzo</option>
+          <option value="4">Abril</option>
+          <option value="5">Mayo</option>
+          <option value="6">Junio</option>
+          <option value="7">Julio</option>
+          <option value="8">Agosto</option>
+          <option value="9">Septiembre</option>
+          <option value="10">Octubre</option>
+          <option value="11">Noviembre</option>
+          <option value="12">Diciembre</option>
+        </select>
+      </div>
+      <div class="calendario-eventos__control">
+        <label for="filtro-ano">Año</label>
+        <select id="filtro-ano" class="calendario-eventos__control-select">
+          <option value="">Todos</option>
+          <!-- Se llenarán con años, por ejemplo: 2023, 2024, 2025, etc. -->
+        </select>
+      </div>
+      <div class="calendario-eventos__control">
+        <label for="filtro-fecha-inicio">Desde</label>
+        <div class="calendario-eventos__control-fecha-wrapper">
+          <input type="date" id="filtro-fecha-inicio" class="calendario-eventos__control-fecha">
+          <button id="borrar-fecha-inicio" class="calendario-eventos__control-fecha-borrar">✕</button>
+        </div>
+      </div>
+      <div class="calendario-eventos__control">
+        <label for="filtro-fecha-fin">Hasta</label>
+        <div class="calendario-eventos__control-fecha-wrapper">
+          <input type="date" id="filtro-fecha-fin" class="calendario-eventos__control-fecha">
+          <button id="borrar-fecha-fin" class="calendario-eventos__control-fecha-borrar">✕</button>
+        </div>
+      </div>
+      <div class="calendario-eventos__control">
+        <label for="filtro-busqueda">Buscar</label>
+        <input type="text" id="filtro-busqueda" class="calendario-eventos__control-busqueda" placeholder="Palabras clave">
       </div>
     </div>
-    <div class="tablon-anuncios__lista" id="lista-anuncios">
-      <!-- Los anuncios se cargarán dinámicamente -->
+
+    <!-- Vista dinámica del calendario -->
+    <div class="calendario-eventos__vista" id="vista-calendario">
+      <!-- Se generará el grid dinámicamente -->
     </div>
   </div>
 
   <script>
-    // Función para cargar anuncios desde un archivo JSON
-    async function cargarAnuncios() {
-      try {
-        const respuesta = await fetch('announcements.json');
-        const datos = await respuesta.json();
-        return datos;
-      } catch (error) {
-        console.error('Error al cargar anuncios:', error);
-        return [];
+    /***************************************
+     * Datos de eventos (ejemplo)
+     ***************************************/
+    const eventos = [
+      { id: 1, title: "Reunión de Fallas", description: "Reunión para organizar el evento", date: "2025-03-15", category: "Urgente" },
+      { id: 2, title: "Exposición Cultural", description: "Exposición de arte en el centro", date: "2025-04-10", category: "Información" },
+      { id: 3, title: "Mantenimiento", description: "Revisión del sistema de iluminación", date: "2025-03-20", category: "Recordatorio" },
+      { id: 4, title: "Concierto", description: "Concierto de música tradicional", date: "2025-03-15", category: "Información" }
+      // Puedes agregar más eventos
+    ];
+
+    /***************************************
+     * Funciones Auxiliares
+     ***************************************/
+    // Formatea una fecha (objeto Date) en "YYYY-MM-DD"
+    function formatearFecha(date) {
+      const anio = date.getFullYear();
+      const mes = String(date.getMonth() + 1).padStart(2, '0');
+      const dia = String(date.getDate()).padStart(2, '0');
+      return `${anio}-${mes}-${dia}`;
+    }
+
+    /***************************************
+     * Llenar Selects para Día y Año
+     ***************************************/
+    function llenarDias() {
+      const selectDia = document.getElementById('filtro-dia');
+      for (let d = 1; d <= 31; d++) {
+        const opcion = document.createElement('option');
+        opcion.value = d;
+        opcion.textContent = d;
+        selectDia.appendChild(opcion);
+      }
+    }
+    function llenarAnios() {
+      const selectAno = document.getElementById('filtro-ano');
+      // Por ejemplo, años de 2023 a 2026
+      for (let a = 2023; a <= 2026; a++) {
+        const opcion = document.createElement('option');
+        opcion.value = a;
+        opcion.textContent = a;
+        selectAno.appendChild(opcion);
       }
     }
 
-    // Función para renderizar los anuncios
-    function renderizarAnuncios(anuncios) {
-      const contenedor = document.getElementById('lista-anuncios');
-      contenedor.innerHTML = '';
-      if (anuncios.length === 0) {
-        contenedor.innerHTML = '<p>No se encontraron anuncios.</p>';
-        return;
-      }
-      anuncios.forEach(anuncio => {
-        let claseModificador = '';
-        if (anuncio.category === 'Urgente') {
-          claseModificador = 'tablon-anuncios__item--urgente';
-        } else if (anuncio.category === 'Información') {
-          claseModificador = 'tablon-anuncios__item--informacion';
-        } else if (anuncio.category === 'Recordatorio') {
-          claseModificador = 'tablon-anuncios__item--recordatorio';
+    /***************************************
+     * Función para actualizar filtros y vista
+     ***************************************/
+    function actualizarVista() {
+      // Obtener valores de controles
+      const diaFiltro = document.getElementById('filtro-dia').value;
+      const mesFiltro = document.getElementById('filtro-mes').value;
+      const anoFiltro = document.getElementById('filtro-ano').value;
+      const fechaInicio = document.getElementById('filtro-fecha-inicio').value;
+      const fechaFin = document.getElementById('filtro-fecha-fin').value;
+      const busqueda = document.getElementById('filtro-busqueda').value.toLowerCase();
+
+      // Filtrar eventos según los controles
+      let eventosFiltrados = eventos.filter(evento => {
+        let coincide = true;
+        if (busqueda) {
+          coincide = evento.title.toLowerCase().includes(busqueda) ||
+                     evento.description.toLowerCase().includes(busqueda);
         }
-        const div = document.createElement('div');
-        div.className = `tablon-anuncios__item ${claseModificador}`;
-        div.innerHTML = `
-          <h2 class="tablon-anuncios__item-titulo">${anuncio.title}</h2>
-          <p class="tablon-anuncios__item-contenido">${anuncio.content}</p>
-          <div class="tablon-anuncios__item-meta">
-            <span>${anuncio.date}</span>
-            <span>${anuncio.category}</span>
-          </div>
-        `;
-        contenedor.appendChild(div);
+        if (coincide && anoFiltro) {
+          coincide = evento.date.startsWith(anoFiltro);
+        }
+        if (coincide && mesFiltro) {
+          const mesEvento = evento.date.substring(5,7);
+          coincide = (mesEvento === mesFiltro.padStart(2, '0'));
+        }
+        if (coincide && diaFiltro) {
+          const diaEvento = evento.date.substring(8,10);
+          coincide = (diaEvento === String(diaFiltro).padStart(2, '0'));
+        }
+        if (coincide && fechaInicio) {
+          coincide = evento.date >= fechaInicio;
+        }
+        if (coincide && fechaFin) {
+          coincide = evento.date <= fechaFin;
+        }
+        return coincide;
       });
+      renderizarCalendario(eventosFiltrados);
     }
 
-    // Función para filtrar anuncios según categoría y fecha
-    function filtrarAnuncios(anuncios, categoria, fecha) {
-      return anuncios.filter(item => {
-        const coincideCategoria = categoria ? (item.category === categoria) : true;
-        const coincideFecha = fecha ? (item.date === fecha) : true;
-        return coincideCategoria && coincideFecha;
-      });
-    }
+    /***************************************
+     * Función para renderizar la vista del calendario
+     ***************************************/
+    function renderizarCalendario(eventosFiltrados) {
+      const contenedor = document.getElementById('vista-calendario');
+      contenedor.innerHTML = '';
 
-    async function iniciarAnuncios() {
-      const todosLosAnuncios = await cargarAnuncios();
-      const filtroCategoria = document.getElementById('filtro-categoria');
-      const filtroFecha = document.getElementById('filtro-fecha');
-      const botonBorrarFecha = document.getElementById('borrar-fecha');
-
-      function aplicarFiltros() {
-        const categoriaSeleccionada = filtroCategoria.value;
-        const fechaSeleccionada = filtroFecha.value;
-        const filtrados = filtrarAnuncios(todosLosAnuncios, categoriaSeleccionada, fechaSeleccionada);
-        renderizarAnuncios(filtrados);
+      // Usaremos el mes y año de los filtros si están establecidos, o el actual
+      let anio, mes;
+      const anoFiltro = document.getElementById('filtro-ano').value;
+      const mesFiltro = document.getElementById('filtro-mes').value;
+      if (anoFiltro) {
+        anio = parseInt(anoFiltro);
+      } else {
+        anio = new Date().getFullYear();
+      }
+      if (mesFiltro) {
+        mes = parseInt(mesFiltro) - 1; // Meses: 0-indexado
+      } else {
+        mes = new Date().getMonth();
       }
 
-      // Renderiza inicialmente todos los anuncios
-      renderizarAnuncios(todosLosAnuncios);
+      // Crear objeto Date para el primer día del mes de referencia
+      const fechaReferencia = new Date(anio, mes, 1);
+      const diasEnMes = new Date(anio, mes + 1, 0).getDate();
 
-      // Asigna eventos a los controles de filtro
-      filtroCategoria.addEventListener('change', aplicarFiltros);
-      filtroFecha.addEventListener('change', aplicarFiltros);
-      botonBorrarFecha.addEventListener('click', () => {
-        filtroFecha.value = '';
-        aplicarFiltros();
+      // Crear grid para el calendario
+      const grid = document.createElement('div');
+      grid.className = 'calendario-eventos__grid';
+
+      // Cabecera con días de la semana (suponiendo lunes a domingo)
+      const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      diasSemana.forEach(dia => {
+        const celdaCabecera = document.createElement('div');
+        celdaCabecera.className = 'calendario-eventos__celda-cabecera';
+        celdaCabecera.textContent = dia;
+        grid.appendChild(celdaCabecera);
+      });
+
+      // Calcular el día de la semana del primer día (0 = domingo, 1 = lunes, etc.)
+      let primerDiaSemana = new Date(anio, mes, 1).getDay();
+      primerDiaSemana = (primerDiaSemana === 0) ? 7 : primerDiaSemana; // Ajustamos para que lunes sea 1
+      const espaciosPrevios = primerDiaSemana - 1;
+      for (let i = 0; i < espaciosPrevios; i++) {
+        const celdaVacia = document.createElement('div');
+        grid.appendChild(celdaVacia);
+      }
+
+      // Crear celdas para cada día del mes
+      for (let d = 1; d <= diasEnMes; d++) {
+        const fechaActual = new Date(anio, mes, d);
+        const fechaStr = formatearFecha(fechaActual);
+        const celdaDia = document.createElement('div');
+        celdaDia.className = 'calendario-eventos__celda-dia';
+        celdaDia.textContent = d;
+
+        // Verificar si hay eventos en esta fecha
+        const eventosDia = eventosFiltrados.filter(evento => evento.date === fechaStr);
+        if (eventosDia.length > 0) {
+          celdaDia.classList.add('calendario-eventos__celda-dia--evento');
+          // Crear tooltip para mostrar detalles de eventos
+          const tooltip = document.createElement('div');
+          tooltip.className = 'calendario-eventos__tooltip';
+          tooltip.textContent = eventosDia.map(e => e.title + ": " + e.description).join("\n");
+          celdaDia.appendChild(tooltip);
+        }
+        grid.appendChild(celdaDia);
+      }
+      contenedor.appendChild(grid);
+    }
+
+    /***************************************
+     * Asignar eventos a los controles
+     ***************************************/
+    function asignarEventosControles() {
+      const controles = document.querySelectorAll('#filtro-dia, #filtro-mes, #filtro-ano, #filtro-fecha-inicio, #filtro-fecha-fin, #filtro-busqueda');
+      controles.forEach(control => {
+        control.addEventListener('change', actualizarVista);
+        control.addEventListener('input', actualizarVista);
+      });
+      // Botones para borrar fecha inicio y fecha fin
+      document.getElementById('borrar-fecha-inicio').addEventListener('click', () => {
+        document.getElementById('filtro-fecha-inicio').value = '';
+        actualizarVista();
+      });
+      document.getElementById('borrar-fecha-fin').addEventListener('click', () => {
+        document.getElementById('filtro-fecha-fin').value = '';
+        actualizarVista();
       });
     }
 
-    document.addEventListener('DOMContentLoaded', iniciarAnuncios);
+    /***************************************
+     * Inicialización del calendario
+     ***************************************/
+    function iniciarCalendario() {
+      llenarDias();
+      llenarAnios();
+      asignarEventosControles();
+      actualizarVista();
+    }
+
+    document.addEventListener('DOMContentLoaded', iniciarCalendario);
   </script>
 </body>
 </html>
