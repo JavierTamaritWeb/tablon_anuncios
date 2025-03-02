@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calendario de Eventos - Falla Suïssa</title>
   <style>
     /* ==========================
@@ -13,9 +13,9 @@
       margin: 2rem auto;
       padding: 2rem;
       background-color: #fdf2e9; /* naranja-suave */
-      border: 1px solid #fdfdfd;  /* blanco-sutil-gris */
+      border: 1px solid #fdfdfd; /* blanco-sutil-gris */
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       font-family: Arial, sans-serif;
     }
     .calendario-eventos__cabecera {
@@ -24,9 +24,10 @@
     }
     .calendario-eventos__cabecera-titulo {
       font-size: 2.5rem;
-      color: #FF6F61; /* primary-color */
+      color: #ff6f61; /* primary-color */
       margin: 0;
     }
+
     /* ===== CONTROLES DE FILTRO ===== */
     .calendario-eventos__controles {
       display: flex;
@@ -35,7 +36,6 @@
       justify-content: center;
       margin-bottom: 1.5rem;
     }
-    /* Cada control se agrupa en un contenedor */
     .calendario-eventos__control {
       display: flex;
       flex-direction: column;
@@ -63,13 +63,14 @@
       background-color: black;
       color: white;
     }
-    /* Contenedor para el input de fecha con botón de limpiar */
+
+    /* Contenedor para input de fecha + botón de limpiar */
     .calendario-eventos__control-fecha-wrapper {
       position: relative;
       display: inline-block;
     }
     .calendario-eventos__control-fecha {
-      padding-right: 3rem;
+      padding-right: 3rem; /* Espacio para la 'X' */
     }
     .calendario-eventos__control-fecha::-webkit-calendar-picker-indicator {
       position: absolute;
@@ -95,75 +96,82 @@
     .calendario-eventos__control-fecha-wrapper:hover .calendario-eventos__control-fecha-borrar {
       color: white;
     }
-    /* ===== VISTA DEL CALENDARIO ===== */
-    .calendario-eventos__vista {
-      margin-top: 2rem;
-    }
-    .calendario-eventos__grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 0.5rem;
-    }
-    /* Celda de la cabecera de la semana */
-    .calendario-eventos__celda-cabecera {
+
+    /* ===== LEYENDA (mes y año actuales) Y DETALLE DE EVENTOS ===== */
+    .calendario-eventos__leyenda {
+      margin: 1rem 0;
+      font-size: 1.2rem;
+      color: #333;
       text-align: center;
       font-weight: bold;
-      padding: 0.5rem;
+    }
+    .calendario-eventos__detalles-mes {
+      margin: 1rem 0;
+      background-color: #fff;
+      border: 1px solid #fdfdfd;
+      border-radius: 5px;
+      padding: 1rem;
       color: #333;
     }
-    /* Celda de un día */
-    .calendario-eventos__celda-dia {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: center;
-      position: relative;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+    .calendario-eventos__detalles-mes h2 {
+      margin-top: 0;
+      font-size: 1.3rem;
+      color: #ff6f61;
     }
-    .calendario-eventos__celda-dia:hover {
-      background-color: #FF6F61;
-      color: white;
+    .calendario-eventos__detalles-mes ul {
+      margin-left: 1.5rem;
+      list-style: disc;
     }
-    /* Resaltar celda con evento */
-    .calendario-eventos__celda-dia--evento {
-      background-color: #FF6F61;
-      color: white;
+    .calendario-eventos__detalles-mes li {
+      margin-bottom: 0.5rem;
     }
-    /* Tooltip para detalles de evento */
-    .calendario-eventos__tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background-color: #333;
-      color: white;
-      padding: 0.5rem;
-      border-radius: 5px;
-      white-space: pre-wrap;
-      font-size: 0.8rem;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s ease;
+
+    /* ===== LISTA DE ANUNCIOS ===== */
+    .calendario-eventos__lista {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
     }
-    .calendario-eventos__celda-dia:hover .calendario-eventos__tooltip {
-      opacity: 1;
+    .calendario-eventos__item {
+      background-color: #fff;
+      border: 1px solid #fdfdfd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
+    .calendario-eventos__item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    .calendario-eventos__item-titulo {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: #ff6f61;
+    }
+    .calendario-eventos__item-contenido {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    .calendario-eventos__item-meta {
+      font-size: 0.9rem;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ===== MODIFICADORES DE CATEGORÍA ===== */
+    .calendario-eventos__item--urgente {
+      border-left: 6px solid red;
+    }
+    .calendario-eventos__item--informacion {
+      border-left: 6px solid #000080;
+    }
+    .calendario-eventos__item--recordatorio {
+      border-left: 6px solid orange;
+    }
+
     /* ===== RESPONSIVIDAD ===== */
-    @media (max-width: 768px) {
-      .calendario-eventos {
-        padding: 1.5rem;
-        margin: 1rem;
-      }
-      .calendario-eventos__cabecera-titulo {
-        font-size: 2rem;
-      }
-      .calendario-eventos__controles {
-        flex-direction: column;
-      }
-      .calendario-eventos__grid {
-        grid-template-columns: repeat(7, 1fr);
-      }
-    }
     @media (max-width: 480px) {
       .calendario-eventos {
         padding: 1rem;
@@ -172,10 +180,62 @@
       .calendario-eventos__cabecera-titulo {
         font-size: 1.75rem;
       }
+      .calendario-eventos__controles {
+        flex-direction: column;
+        align-items: center;
+      }
       .calendario-eventos__control-select,
       .calendario-eventos__control-fecha,
       .calendario-eventos__control-busqueda {
         width: 100%;
+      }
+      .calendario-eventos__detalles-mes h2 {
+        font-size: 1.1rem;
+      }
+      .calendario-eventos__item-meta {
+        font-size: 0.8rem;
+      }
+    }
+    @media (min-width: 481px) and (max-width: 768px) {
+      .calendario-eventos {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+      .calendario-eventos__cabecera-titulo {
+        font-size: 2rem;
+      }
+      .calendario-eventos__controles-select,
+      .calendario-eventos__control-fecha,
+      .calendario-eventos__control-busqueda {
+        width: 100%;
+        max-width: 300px;
+      }
+      .calendario-eventos__lista {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .calendario-eventos {
+        max-width: 800px;
+        padding: 1.75rem;
+      }
+      .calendario-eventos__cabecera-titulo {
+        font-size: 2.25rem;
+      }
+      .calendario-eventos__lista {
+        gap: 1rem;
+      }
+    }
+    @media (min-width: 1025px) and (max-width: 1200px) {
+      .calendario-eventos {
+        max-width: 900px;
+        padding: 2rem;
+      }
+      .calendario-eventos__cabecera-titulo {
+        font-size: 2.5rem;
+      }
+      .calendario-eventos__lista {
+        gap: 1.5rem;
       }
     }
   </style>
@@ -185,13 +245,13 @@
     <header class="calendario-eventos__cabecera">
       <h1 class="calendario-eventos__cabecera-titulo">Calendario de Eventos</h1>
     </header>
+
     <!-- Controles de filtrado -->
     <div class="calendario-eventos__controles">
       <div class="calendario-eventos__control">
         <label for="filtro-dia">Día</label>
         <select id="filtro-dia" class="calendario-eventos__control-select">
           <option value="">Todos</option>
-          <!-- Se llenarán del 1 al 31 -->
         </select>
       </div>
       <div class="calendario-eventos__control">
@@ -216,7 +276,7 @@
         <label for="filtro-ano">Año</label>
         <select id="filtro-ano" class="calendario-eventos__control-select">
           <option value="">Todos</option>
-          <!-- Se llenarán con años, por ejemplo: 2023, 2024, 2025, etc. -->
+          <!-- Se llenará en JS -->
         </select>
       </div>
       <div class="calendario-eventos__control">
@@ -237,40 +297,239 @@
         <label for="filtro-busqueda">Buscar</label>
         <input type="text" id="filtro-busqueda" class="calendario-eventos__control-busqueda" placeholder="Palabras clave">
       </div>
+      <div class="calendario-eventos__control">
+        <label for="filtro-categoria">Categoría</label>
+        <select id="filtro-categoria" class="calendario-eventos__control-select">
+          <option value="">Todas</option>
+          <option value="Urgente">Urgente</option>
+          <option value="Información">Información</option>
+          <option value="Recordatorio">Recordatorio</option>
+        </select>
+      </div>
+      <div class="calendario-eventos__control">
+        <label for="filtro-fecha">Fecha puntual</label>
+        <div class="calendario-eventos__control-fecha-wrapper">
+          <input type="date" id="filtro-fecha" class="calendario-eventos__control-fecha">
+          <button id="borrar-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
+        </div>
+      </div>
     </div>
 
-    <!-- Vista dinámica del calendario -->
-    <div class="calendario-eventos__vista" id="vista-calendario">
-      <!-- Se generará el grid dinámicamente -->
+    <!-- Leyenda con el mes y año actuales -->
+    <div class="calendario-eventos__leyenda" id="info-mes">
+      <!-- "Mostrando eventos de [Mes Nombre] [Año]" -->
+    </div>
+
+    <!-- Descripción detallada de los eventos del mes -->
+    <div class="calendario-eventos__detalles-mes" id="descripcion-eventos-mes">
+      <!-- Listado de eventos del mes en forma de bullet list -->
+    </div>
+
+    <!-- Lista de anuncios (los eventos filtrados) -->
+    <div class="calendario-eventos__lista" id="lista-anuncios">
+      <!-- Se inyectan dinámicamente -->
     </div>
   </div>
 
   <script>
-    /***************************************
-     * Datos de eventos (ejemplo)
-     ***************************************/
+    /********************************************
+     * Datos de ejemplo
+     ********************************************/
     const eventos = [
-      { id: 1, title: "Reunión de Fallas", description: "Reunión para organizar el evento", date: "2025-03-15", category: "Urgente" },
-      { id: 2, title: "Exposición Cultural", description: "Exposición de arte en el centro", date: "2025-04-10", category: "Información" },
+      { id: 1, title: "Reunión de Fallas", description: "Organización general", date: "2025-03-15", category: "Urgente" },
+      { id: 2, title: "Exposición Cultural", description: "Exposición de arte en el centro cultural", date: "2025-04-10", category: "Información" },
       { id: 3, title: "Mantenimiento", description: "Revisión del sistema de iluminación", date: "2025-03-20", category: "Recordatorio" },
-      { id: 4, title: "Concierto", description: "Concierto de música tradicional", date: "2025-03-15", category: "Información" }
-      // Puedes agregar más eventos
+      { id: 4, title: "Concierto", description: "Concierto de música tradicional", date: "2025-03-15", category: "Información" },
+      { id: 5, title: "Paella Popular", description: "Evento gastronómico en la plaza", date: "2025-05-08", category: "Información" }
     ];
 
-    /***************************************
-     * Funciones Auxiliares
-     ***************************************/
-    // Formatea una fecha (objeto Date) en "YYYY-MM-DD"
-    function formatearFecha(date) {
-      const anio = date.getFullYear();
-      const mes = String(date.getMonth() + 1).padStart(2, '0');
-      const dia = String(date.getDate()).padStart(2, '0');
-      return `${anio}-${mes}-${dia}`;
+    const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+
+    /********************************************
+     * Convertir "yyyy-mm-dd" a Date object
+     ********************************************/
+    function toDateObj(str) {
+      // Si no hay valor o no cumple el patrón, retornamos null
+      if (!str || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return null;
+      const [yyyy, mm, dd] = str.split("-").map(x => parseInt(x,10));
+      return new Date(yyyy, mm-1, dd);
     }
 
-    /***************************************
-     * Llenar Selects para Día y Año
-     ***************************************/
+    /********************************************
+     * Función para comprobar si un e.date (string)
+     * está dentro del rango [fechaInicio, fechaFin]
+     ********************************************/
+    function cumpleRango(eDateStr, fechaInicioStr, fechaFinStr) {
+      const eDate = toDateObj(eDateStr);
+      if (!eDate) return false; // El evento tiene una fecha inválida
+
+      const iniDate = toDateObj(fechaInicioStr);
+      const finDate = toDateObj(fechaFinStr);
+
+      // Si no hay rango definido, se considera que cumple
+      if (!iniDate && !finDate) return true;
+      // Comparaciones con getTime()
+      if (iniDate && eDate.getTime() < iniDate.getTime()) return false;
+      if (finDate && eDate.getTime() > finDate.getTime()) return false;
+      return true;
+    }
+
+    /********************************************
+     * Filtrar eventos con la lógica "mes OR rango"
+     ********************************************/
+    function filtrarEventos() {
+      const diaFiltro = document.getElementById('filtro-dia').value;
+      const mesFiltro = document.getElementById('filtro-mes').value;
+      const anoFiltro = document.getElementById('filtro-ano').value;
+      const fechaInicio = document.getElementById('filtro-fecha-inicio').value; 
+      const fechaFin = document.getElementById('filtro-fecha-fin').value;
+      const busqueda = document.getElementById('filtro-busqueda').value.toLowerCase();
+      const categoria = document.getElementById('filtro-categoria').value;
+      const fechaPuntual = document.getElementById('filtro-fecha').value;
+
+      return eventos.filter(e => {
+        let coincide = true;
+
+        // 1) Búsqueda
+        if (busqueda) {
+          coincide = e.title.toLowerCase().includes(busqueda) ||
+                     e.description.toLowerCase().includes(busqueda);
+        }
+        // 2) Año
+        if (coincide && anoFiltro) {
+          coincide = e.date.startsWith(anoFiltro);
+        }
+        // 3) Día
+        if (coincide && diaFiltro) {
+          const diaEvento = e.date.substring(8,10);
+          coincide = (diaEvento === String(diaFiltro).padStart(2,"0"));
+        }
+        // 4) Categoría
+        if (coincide && categoria) {
+          coincide = (e.category === categoria);
+        }
+        // 5) Fecha puntual
+        if (coincide && fechaPuntual) {
+          // e.date debe ser == fechaPuntual
+          coincide = (e.date === fechaPuntual);
+        }
+
+        // 6) Mes y/o Rango => OR
+        let cumpleMes = true;
+        if (mesFiltro) {
+          const mesEvento = e.date.substring(5,7);
+          cumpleMes = (mesEvento === mesFiltro.padStart(2,"0"));
+        }
+        let cumpleIntervalo = cumpleRango(e.date, fechaInicio, fechaFin);
+
+        // Si el usuario definió mes o rango, se aplica OR
+        const tieneMes = Boolean(mesFiltro);
+        const tieneRango = Boolean(fechaInicio || fechaFin);
+
+        if (coincide && (tieneMes || tieneRango)) {
+          coincide = (cumpleMes || cumpleIntervalo);
+        }
+        return coincide;
+      });
+    }
+
+    /********************************************
+     * Leyenda (mes + año)
+     ********************************************/
+    function actualizarLeyenda(mes, anio) {
+      const infoMes = document.getElementById('info-mes');
+      infoMes.textContent = `Mostrando eventos de ${MESES[mes]} ${anio}`;
+    }
+
+    /********************************************
+     * Descripción detallada de eventos del mes
+     ********************************************/
+    function mostrarDescripcionMes(eventosDelMes, mes, anio) {
+      const contenedor = document.getElementById('descripcion-eventos-mes');
+      contenedor.innerHTML = '';
+      const nombreMes = MESES[mes];
+      const titulo = document.createElement('h2');
+      titulo.textContent = `Eventos de ${nombreMes} ${anio}`;
+      contenedor.appendChild(titulo);
+
+      if (eventosDelMes.length === 0) {
+        const p = document.createElement('p');
+        p.textContent = 'No hay eventos para este mes.';
+        contenedor.appendChild(p);
+        return;
+      }
+      const ul = document.createElement('ul');
+      eventosDelMes.forEach(ev => {
+        const li = document.createElement('li');
+        li.textContent = `${ev.title} (${ev.date}): ${ev.description}`;
+        ul.appendChild(li);
+      });
+      contenedor.appendChild(ul);
+    }
+
+    /********************************************
+     * Renderizar Lista de Anuncios
+     ********************************************/
+    function renderizarLista(eventosFiltrados) {
+      const lista = document.getElementById('lista-anuncios');
+      lista.innerHTML = '';
+      if (eventosFiltrados.length === 0) {
+        lista.innerHTML = '<p>No se encontraron anuncios.</p>';
+        return;
+      }
+      eventosFiltrados.forEach(e => {
+        let claseModificador = '';
+        if (e.category === 'Urgente') {
+          claseModificador = 'calendario-eventos__item--urgente';
+        } else if (e.category === 'Información') {
+          claseModificador = 'calendario-eventos__item--informacion';
+        } else if (e.category === 'Recordatorio') {
+          claseModificador = 'calendario-eventos__item--recordatorio';
+        }
+        const div = document.createElement('div');
+        div.className = `calendario-eventos__item ${claseModificador}`;
+        div.innerHTML = `
+          <h2 class="calendario-eventos__item-titulo">${e.title}</h2>
+          <p class="calendario-eventos__item-contenido">${e.description}</p>
+          <div class="calendario-eventos__item-meta">
+            <span>${e.date}</span>
+            <span>${e.category}</span>
+          </div>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    /********************************************
+     * Actualizar Vista
+     ********************************************/
+    function actualizarVista() {
+      const filtrados = filtrarEventos();
+      renderizarLista(filtrados);
+
+      // Determinar mes/año de referencia para la leyenda
+      let mes = new Date().getMonth();
+      let anio = new Date().getFullYear();
+      const mesFiltro = document.getElementById('filtro-mes').value;
+      const anoFiltro = document.getElementById('filtro-ano').value;
+      if (mesFiltro) mes = parseInt(mesFiltro) - 1;
+      if (anoFiltro) anio = parseInt(anoFiltro);
+
+      // Actualizar leyenda
+      actualizarLeyenda(mes, anio);
+
+      // Listar eventos de ese mes en el array filtrado
+      const eventosEsteMes = filtrados.filter(e => {
+        const yearE = parseInt(e.date.substring(0,4));
+        const monthE = parseInt(e.date.substring(5,7));
+        return (yearE === anio && (monthE === (mes+1)));
+      });
+      mostrarDescripcionMes(eventosEsteMes, mes, anio);
+    }
+
+    /********************************************
+     * Inicializar
+     ********************************************/
     function llenarDias() {
       const selectDia = document.getElementById('filtro-dia');
       for (let d = 1; d <= 31; d++) {
@@ -282,7 +541,6 @@
     }
     function llenarAnios() {
       const selectAno = document.getElementById('filtro-ano');
-      // Por ejemplo, años de 2023 a 2026
       for (let a = 2023; a <= 2026; a++) {
         const opcion = document.createElement('option');
         opcion.value = a;
@@ -291,128 +549,13 @@
       }
     }
 
-    /***************************************
-     * Función para actualizar filtros y vista
-     ***************************************/
-    function actualizarVista() {
-      // Obtener valores de controles
-      const diaFiltro = document.getElementById('filtro-dia').value;
-      const mesFiltro = document.getElementById('filtro-mes').value;
-      const anoFiltro = document.getElementById('filtro-ano').value;
-      const fechaInicio = document.getElementById('filtro-fecha-inicio').value;
-      const fechaFin = document.getElementById('filtro-fecha-fin').value;
-      const busqueda = document.getElementById('filtro-busqueda').value.toLowerCase();
-
-      // Filtrar eventos según los controles
-      let eventosFiltrados = eventos.filter(evento => {
-        let coincide = true;
-        if (busqueda) {
-          coincide = evento.title.toLowerCase().includes(busqueda) ||
-                     evento.description.toLowerCase().includes(busqueda);
-        }
-        if (coincide && anoFiltro) {
-          coincide = evento.date.startsWith(anoFiltro);
-        }
-        if (coincide && mesFiltro) {
-          const mesEvento = evento.date.substring(5,7);
-          coincide = (mesEvento === mesFiltro.padStart(2, '0'));
-        }
-        if (coincide && diaFiltro) {
-          const diaEvento = evento.date.substring(8,10);
-          coincide = (diaEvento === String(diaFiltro).padStart(2, '0'));
-        }
-        if (coincide && fechaInicio) {
-          coincide = evento.date >= fechaInicio;
-        }
-        if (coincide && fechaFin) {
-          coincide = evento.date <= fechaFin;
-        }
-        return coincide;
+    function asignarEventos() {
+      const controles = document.querySelectorAll('#filtro-dia, #filtro-mes, #filtro-ano, #filtro-fecha-inicio, #filtro-fecha-fin, #filtro-busqueda, #filtro-categoria, #filtro-fecha');
+      controles.forEach(ctrl => {
+        ctrl.addEventListener('change', actualizarVista);
+        ctrl.addEventListener('input', actualizarVista);
       });
-      renderizarCalendario(eventosFiltrados);
-    }
-
-    /***************************************
-     * Función para renderizar la vista del calendario
-     ***************************************/
-    function renderizarCalendario(eventosFiltrados) {
-      const contenedor = document.getElementById('vista-calendario');
-      contenedor.innerHTML = '';
-
-      // Usaremos el mes y año de los filtros si están establecidos, o el actual
-      let anio, mes;
-      const anoFiltro = document.getElementById('filtro-ano').value;
-      const mesFiltro = document.getElementById('filtro-mes').value;
-      if (anoFiltro) {
-        anio = parseInt(anoFiltro);
-      } else {
-        anio = new Date().getFullYear();
-      }
-      if (mesFiltro) {
-        mes = parseInt(mesFiltro) - 1; // Meses: 0-indexado
-      } else {
-        mes = new Date().getMonth();
-      }
-
-      // Crear objeto Date para el primer día del mes de referencia
-      const fechaReferencia = new Date(anio, mes, 1);
-      const diasEnMes = new Date(anio, mes + 1, 0).getDate();
-
-      // Crear grid para el calendario
-      const grid = document.createElement('div');
-      grid.className = 'calendario-eventos__grid';
-
-      // Cabecera con días de la semana (suponiendo lunes a domingo)
-      const diasSemana = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
-      diasSemana.forEach(dia => {
-        const celdaCabecera = document.createElement('div');
-        celdaCabecera.className = 'calendario-eventos__celda-cabecera';
-        celdaCabecera.textContent = dia;
-        grid.appendChild(celdaCabecera);
-      });
-
-      // Calcular el día de la semana del primer día (0 = domingo, 1 = lunes, etc.)
-      let primerDiaSemana = new Date(anio, mes, 1).getDay();
-      primerDiaSemana = (primerDiaSemana === 0) ? 7 : primerDiaSemana; // Ajustamos para que lunes sea 1
-      const espaciosPrevios = primerDiaSemana - 1;
-      for (let i = 0; i < espaciosPrevios; i++) {
-        const celdaVacia = document.createElement('div');
-        grid.appendChild(celdaVacia);
-      }
-
-      // Crear celdas para cada día del mes
-      for (let d = 1; d <= diasEnMes; d++) {
-        const fechaActual = new Date(anio, mes, d);
-        const fechaStr = formatearFecha(fechaActual);
-        const celdaDia = document.createElement('div');
-        celdaDia.className = 'calendario-eventos__celda-dia';
-        celdaDia.textContent = d;
-
-        // Verificar si hay eventos en esta fecha
-        const eventosDia = eventosFiltrados.filter(evento => evento.date === fechaStr);
-        if (eventosDia.length > 0) {
-          celdaDia.classList.add('calendario-eventos__celda-dia--evento');
-          // Crear tooltip para mostrar detalles de eventos
-          const tooltip = document.createElement('div');
-          tooltip.className = 'calendario-eventos__tooltip';
-          tooltip.textContent = eventosDia.map(e => e.title + ": " + e.description).join("\n");
-          celdaDia.appendChild(tooltip);
-        }
-        grid.appendChild(celdaDia);
-      }
-      contenedor.appendChild(grid);
-    }
-
-    /***************************************
-     * Asignar eventos a los controles
-     ***************************************/
-    function asignarEventosControles() {
-      const controles = document.querySelectorAll('#filtro-dia, #filtro-mes, #filtro-ano, #filtro-fecha-inicio, #filtro-fecha-fin, #filtro-busqueda');
-      controles.forEach(control => {
-        control.addEventListener('change', actualizarVista);
-        control.addEventListener('input', actualizarVista);
-      });
-      // Botones para borrar fecha inicio y fecha fin
+      // Botones para limpiar
       document.getElementById('borrar-fecha-inicio').addEventListener('click', () => {
         document.getElementById('filtro-fecha-inicio').value = '';
         actualizarVista();
@@ -421,19 +564,20 @@
         document.getElementById('filtro-fecha-fin').value = '';
         actualizarVista();
       });
+      document.getElementById('borrar-fecha').addEventListener('click', () => {
+        document.getElementById('filtro-fecha').value = '';
+        actualizarVista();
+      });
     }
 
-    /***************************************
-     * Inicialización del calendario
-     ***************************************/
-    function iniciarCalendario() {
+    function iniciar() {
       llenarDias();
       llenarAnios();
-      asignarEventosControles();
+      asignarEventos();
       actualizarVista();
     }
 
-    document.addEventListener('DOMContentLoaded', iniciarCalendario);
+    document.addEventListener('DOMContentLoaded', iniciar);
   </script>
 </body>
 </html>
