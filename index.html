@@ -32,7 +32,7 @@
       justify-content: center;
       margin-bottom: 1.5rem;
     }
-    /* Contenedor para el control de fecha con botón de limpiar */
+    /* Contenedor para el control de fecha con botón de borrar */
     .tablon-anuncios__controles-fecha-wrapper {
       position: relative;
       display: inline-block;
@@ -52,7 +52,17 @@
       background-color: black;
       color: white;
     }
-    /* Botón para limpiar la fecha */
+    /* Aumentamos el padding-right en el input de fecha para dejar espacio para el botón de borrar */
+    .tablon-anuncios__controles-fecha {
+      padding-right: 3rem;
+    }
+    /* Ajuste para navegadores WebKit: reposicionar el icono del calendario */
+    .tablon-anuncios__controles-fecha::-webkit-calendar-picker-indicator {
+      position: absolute;
+      right: 2.5rem;
+      cursor: pointer;
+    }
+    /* Botón para borrar la fecha */
     .tablon-anuncios__controles-fecha-borrar {
       position: absolute;
       right: 0.5rem;
