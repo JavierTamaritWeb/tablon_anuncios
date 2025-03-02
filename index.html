@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tablón de Anuncios - Falla Suïssa</title>
+  <style>
+    /* ===== BLOQUE: tablon-anuncios ===== */
+    .tablon-anuncios {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: #fdf2e9; /* naranja-suave */
+      border: 1px solid #fdfdfd;  /* blanco-sutil-gris */
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .tablon-anuncios__cabecera {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .tablon-anuncios__cabecera-titulo {
+      font-size: 2.5rem;
+      color: #FF6F61; /* primary-color */
+      margin: 0;
+    }
+    /* ===== CONTROLES ===== */
+    .tablon-anuncios__controles {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .tablon-anuncios__controles-select,
+    .tablon-anuncios__controles-fecha {
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #333; /* secondary-color */
+      border-radius: 5px;
+      background-color: #FFFFFF; /* blanco */
+      color: #333;
+      transition: background-color 0.3s ease;
+      transition: color 0.3s ease;
+    }
+    .tablon-anuncios__controles-select:hover,
+    .tablon-anuncios__controles-fecha:hover {
+      background-color: black;
+      color: white;
+    }
+    /* ===== LISTA DE ANUNCIOS ===== */
+    .tablon-anuncios__lista {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+    /* ===== ITEM (ANUNCIO) ===== */
+    .tablon-anuncios__item {
+      background-color: #FFFFFF;
+      border: 1px solid #fdfdfd;
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .tablon-anuncios__item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+    .tablon-anuncios__item-titulo {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: #FF6F61;
+    }
+    .tablon-anuncios__item-contenido {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    .tablon-anuncios__item-meta {
+      font-size: 0.9rem;
+      color: #333;
+      display: flex;
+      justify-content: space-between;
+    }
+    /* ===== MODIFICADORES DE CATEGORÍA ===== */
+    .tablon-anuncios__item--urgente {
+      border-left: 6px solid red;
+    }
+    .tablon-anuncios__item--informacion {
+      border-left: 6px solid #000080;
+    }
+    .tablon-anuncios__item--recordatorio {
+      border-left: 6px solid orange;
+    }
+    
+    /* ===== RESPONSIVIDAD ===== */
+    @media (max-width: 768px) {
+      .tablon-anuncios {
+        padding: 1.5rem;
+        margin: 1rem;
+      }
+      .tablon-anuncios__cabecera-titulo {
+        font-size: 2rem;
+      }
+      .tablon-anuncios__controles-select,
+      .tablon-anuncios__controles-fecha {
+        width: 100%;
+        max-width: 300px;
+      }
+      .tablon-anuncios__lista {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 480px) {
+      .tablon-anuncios {
+        padding: 1rem;
+        margin: 0.5rem;
+      }
+      .tablon-anuncios__cabecera-titulo {
+        font-size: 1.75rem;
+      }
+      .tablon-anuncios__controles {
+        flex-direction: column;
+        align-items: center;
+      }
+      .tablon-anuncios__controles-select,
+      .tablon-anuncios__controles-fecha {
+        width: 100%;
+        max-width: none;
+      }
+      .tablon-anuncios__item-titulo {
+        font-size: 1.3rem;
+      }
+      .tablon-anuncios__item-contenido {
+        font-size: 0.9rem;
+      }
+      .tablon-anuncios__item-meta {
+        font-size: 1rem;
+        
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="tablon-anuncios">
+    <header class="tablon-anuncios__cabecera">
+      <h1 class="tablon-anuncios__cabecera-titulo">Tablón de Anuncios</h1>
+    </header>
+    <div class="tablon-anuncios__controles">
+      <select class="tablon-anuncios__controles-select" id="filtro-categoria">
+        <option value="">Todas las categorías</option>
+        <option value="Urgente">Urgente</option>
+        <option value="Información">Información</option>
+        <option value="Recordatorio">Recordatorio</option>
+      </select>
+      <input type="date" class="tablon-anuncios__controles-fecha" id="filtro-fecha">
+    </div>
+    <div class="tablon-anuncios__lista" id="lista-anuncios">
+      <!-- Los anuncios se cargarán dinámicamente -->
+    </div>
+  </div>
+
+  <script>
+    // Función para cargar anuncios desde un archivo JSON
+    async function cargarAnuncios() {
+      try {
+        const respuesta = await fetch('announcements.json');
+        const datos = await respuesta.json();
+        return datos;
+      } catch (error) {
+        console.error('Error al cargar anuncios:', error);
+        return [];
+      }
+    }
+
+    // Función para renderizar los anuncios
+    function renderizarAnuncios(anuncios) {
+      const contenedor = document.getElementById('lista-anuncios');
+      contenedor.innerHTML = '';
+      if (anuncios.length === 0) {
+        contenedor.innerHTML = '<p>No se encontraron anuncios.</p>';
+        return;
+      }
+      anuncios.forEach(anuncio => {
+        let claseModificador = '';
+        if (anuncio.category === 'Urgente') {
+          claseModificador = 'tablon-anuncios__item--urgente';
+        } else if (anuncio.category === 'Información') {
+          claseModificador = 'tablon-anuncios__item--informacion';
+        } else if (anuncio.category === 'Recordatorio') {
+          claseModificador = 'tablon-anuncios__item--recordatorio';
+        }
+        const div = document.createElement('div');
+        div.className = `tablon-anuncios__item ${claseModificador}`;
+        div.innerHTML = `
+          <h2 class="tablon-anuncios__item-titulo">${anuncio.title}</h2>
+          <p class="tablon-anuncios__item-contenido">${anuncio.content}</p>
+          <div class="tablon-anuncios__item-meta">
+            <span>${anuncio.date}</span>
+            <span>${anuncio.category}</span>
+          </div>
+        `;
+        contenedor.appendChild(div);
+      });
+    }
+
+    // Función para filtrar anuncios según categoría y fecha
+    function filtrarAnuncios(anuncios, categoria, fecha) {
+      return anuncios.filter(item => {
+        const coincideCategoria = categoria ? (item.category === categoria) : true;
+        const coincideFecha = fecha ? (item.date === fecha) : true;
+        return coincideCategoria && coincideFecha;
+      });
+    }
+
+    async function iniciarAnuncios() {
+      const todosLosAnuncios = await cargarAnuncios();
+      const filtroCategoria = document.getElementById('filtro-categoria');
+      const filtroFecha = document.getElementById('filtro-fecha');
+
+      function aplicarFiltros() {
+        const categoriaSeleccionada = filtroCategoria.value;
+        const fechaSeleccionada = filtroFecha.value;
+        const filtrados = filtrarAnuncios(todosLosAnuncios, categoriaSeleccionada, fechaSeleccionada);
+        renderizarAnuncios(filtrados);
+      }
+
+      // Renderiza inicialmente todos los anuncios
+      renderizarAnuncios(todosLosAnuncios);
+
+      // Asigna eventos a los filtros
+      filtroCategoria.addEventListener('change', aplicarFiltros);
+      filtroFecha.addEventListener('change', aplicarFiltros);
+    }
+
+    document.addEventListener('DOMContentLoaded', iniciarAnuncios);
+  </script>
+</body>
+</html>

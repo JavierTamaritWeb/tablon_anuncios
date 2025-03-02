@@ -1,0 +1,20 @@
+[
+    {
+      "title": "Recordatorio de reunión",
+      "content": "No olvides la reunión de preparación de Fallas el 15 de marzo a las 18:00.",
+      "date": "2025-03-15",
+      "category": "Urgente"
+    },
+    {
+      "title": "Evento cultural",
+      "content": "La Falla presentará una exposición de arte en el centro cultural.",
+      "date": "2025-04-10",
+      "category": "Información"
+    },
+    {
+      "title": "Aviso de mantenimiento",
+      "content": "El sistema de iluminación se revisará el 20 de marzo.",
+      "date": "2025-03-20",
+      "category": "Recordatorio"
+    }
+  ]

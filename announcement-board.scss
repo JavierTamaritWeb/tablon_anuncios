@@ -1,0 +1,99 @@
+@use "sass:color";
+// Suponemos que tienes un archivo de variables que define estos colores:
+$primary-color: #FF6F61;         // Color principal
+$secondary-color: #333;          // Color secundario
+$background-color: #F4F4F9;
+$naranja-suave: #fdf2e9;         // Fondo de la página
+$blanco: #FFFFFF;
+$blanco-hueso: #F5F5F5;
+$blanco-rosado: #fdf4f6;
+$blanco-sutil-gris: #fdfdfd;
+
+.announcement-board {
+  background-color: $naranja-suave;
+  border: 1px solid $blanco-sutil-gris;
+  border-radius: 8px;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 900px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+  &__header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+
+    &-title {
+      font-size: 2.5rem;
+      color: $primary-color;
+    }
+  }
+
+  &__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+
+    &-select,
+    &-date {
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 1px solid $secondary-color;
+      border-radius: 5px;
+      background-color: $blanco;
+      color: $secondary-color;
+      transition: background-color 0.3s ease;
+      &:hover {
+        background-color: color.scale($naranja-suave, $lightness: 10%);
+      }
+    }
+  }
+
+  &__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  &__item {
+    background-color: $blanco;
+    border: 1px solid $blanco-sutil-gris;
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+
+    &-title {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: $primary-color;
+    }
+    &-content {
+      font-size: 1rem;
+      margin-bottom: 1rem;
+      color: $secondary-color;
+    }
+    &-meta {
+      font-size: 0.9rem;
+      color: $secondary-color;
+      display: flex;
+      justify-content: space-between;
+    }
+  }
+
+  /* Modificadores para categorías */
+  &__item--urgente {
+    border-left: 6px solid red;
+  }
+  &__item--informacion {
+    border-left: 6px solid $primary-color;
+  }
+  &__item--recordatorio {
+    border-left: 6px solid orange;
+  }
+}
