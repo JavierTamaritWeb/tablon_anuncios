@@ -64,13 +64,11 @@
     .calendario-eventos__controles {
       margin-bottom: 1.5rem;
     }
-    /* Cada fila de controles */
     .calendario-eventos__fila {
       display: grid;
-      gap: 5rem; /* Valor por defecto para móviles y tabletas */
+      gap: 5rem;
       margin-bottom: 1rem;
     }
-    /* Responsive grid para las filas */
     @media (max-width: 480px) {
       .calendario-eventos__fila {
         grid-template-columns: 1fr;
@@ -89,7 +87,7 @@
     @media (min-width: 1024px) {
       .calendario-eventos__fila {
         grid-template-columns: repeat(4, minmax(150px, 1fr));
-        gap: 2rem; /* Menor gap para aprovechar el espacio horizontal */
+        gap: 2rem;
       }
     }
     .calendario-eventos__control {
@@ -114,7 +112,6 @@
       color: #333;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-    /* Inputs más compactos en pantallas grandes */
     @media (min-width: 1024px) {
       .calendario-eventos__control-texto,
       .calendario-eventos__control-fecha,
@@ -129,7 +126,6 @@
       background-color: #444;
       color: #fff;
     }
-    /* Botones de borrar en los campos (Día, Mes, Año) */
     .calendario-eventos__borrar-campo {
       position: absolute;
       right: 0.5rem;
@@ -151,7 +147,7 @@
       width: 100%;
     }
 
-    /* ============= RANGO DE FECHAS (Flatpickr) ============= */
+    /* Rango de Fechas (Flatpickr) */
     .calendario-eventos__control-fecha-wrapper {
       position: relative;
       display: inline-block;
@@ -159,7 +155,7 @@
     }
     .calendario-eventos__control-fecha {
       width: 100%;
-      padding-right: 4rem; /* Espacio para el ícono y botón de borrar */
+      padding-right: 4rem;
     }
     .calendario-eventos__control-fecha::-webkit-calendar-picker-indicator {
       position: absolute;
@@ -241,13 +237,40 @@
       cursor: pointer;
       position: relative;
     }
-    /* Resaltar fines de semana: se asignarán mediante clases en JS */
+    /* Colores para celdas según categoría (mini calendario) */
+    .calendario-eventos__mini-dia.mini-festivo {
+      background-color: #FF6F61;
+      color: #fff;
+    }
+    .calendario-eventos__mini-dia.mini-falla {
+      background-color: #00909E;
+      color: #fff;
+    }
+    .calendario-eventos__mini-dia.mini-evento {
+      background-color: #4A4A4A;
+      color: #fff;
+    }
+    .calendario-eventos__mini-dia.mini-urgente {
+      background-color: #C13584;
+      color: #fff;
+    }
+    .calendario-eventos__mini-dia.mini-informacion {
+      background-color: #FFD700;
+      color: #000;
+    }
+    .calendario-eventos__mini-dia.mini-recordatorio {
+      background-color: #000080;
+      color: #fff;
+    }
+    /* Resaltar fines de semana */
     .calendario-eventos__mini-dia.fin-sabado {
+      /* Si no tiene categoría asignada, fondo gris claro */
       background-color: #e0e0e0;
     }
     .calendario-eventos__mini-dia.fin-domingo {
+      /* Si no tiene categoría asignada, fondo rosa claro y números en rojo */
       background-color: #ffcccc;
-      color: red; /* Números en rojo para domingos */
+      color: red;
     }
     .calendario-eventos__tooltip {
       visibility: hidden;
@@ -267,14 +290,6 @@
     .calendario-eventos__mini-dia:hover .calendario-eventos__tooltip {
       visibility: visible;
       opacity: 1;
-    }
-    .calendario-eventos__mini-dia.destacado {
-      background-color: #ff6f61;
-      color: #fff;
-    }
-    .calendario-eventos__mini-dia.en-rango {
-      background: linear-gradient(45deg, #ff6f61, #ff9a7d);
-      color: #fff;
     }
     .calendario-eventos__mini-dia.hoy {
       outline: 2px solid blue;
@@ -297,7 +312,7 @@
     }
     .calendario-eventos__item:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
     }
     .calendario-eventos__item-titulo {
       font-size: 1.5rem;
@@ -315,15 +330,25 @@
       display: flex;
       justify-content: space-between;
     }
-    /* MODIFICADORES DE CATEGORÍA */
+    /* Modificadores para la vista de lista (eventos) */
+    .calendario-eventos__item--festivo {
+      border-left: 6px solid #FF6F61;
+    }
+    .calendario-eventos__item--falla {
+      border-left: 6px solid #00909E;
+    }
+    .calendario-eventos__item--evento {
+      border-left: 6px solid #4A4A4A;
+    }
     .calendario-eventos__item--urgente {
-      border-left: 6px solid red;
+      border-left: 6px solid #C13584;
     }
     .calendario-eventos__item--informacion {
-      border-left: 6px solid #000080;
+      border-left: 6px solid #FFD700;
+      color: #000;
     }
     .calendario-eventos__item--recordatorio {
-      border-left: 6px solid orange;
+      border-left: 6px solid #000080;
     }
 
     /* =============================
@@ -382,8 +407,11 @@
             class="calendario-eventos__control-texto"
           >
             <option value="">Todas</option>
+            <option value="Festivo">Festivo</option>
+            <option value="Falla">Falla</option>
+            <option value="Evento">Evento</option>
             <option value="Urgente">Urgente</option>
-            <option value="Información">Información</option>
+            <option value="Informacion">Informacion</option>
             <option value="Recordatorio">Recordatorio</option>
           </select>
         </div>
@@ -481,14 +509,40 @@
 
   <script>
     /********************************************
-     * Datos de ejemplo (simula eventos)
+     * Datos de ejemplo para 2025 (en Valencia)
+     * Se definen los eventos con sus respectivas categorías:
+     *   - Festivo, Falla, Evento, Urgente, Informacion, Recordatorio
      ********************************************/
     const eventos = [
-      { id: 1, title: "Reunión de Fallas", description: "Organización general", date: "2025-03-15", category: "Urgente" },
-      { id: 2, title: "Exposición Cultural", description: "Exposición de arte en el centro cultural", date: "2025-04-10", category: "Información" },
-      { id: 3, title: "Mantenimiento", description: "Revisión del sistema de iluminación", date: "2025-03-20", category: "Recordatorio" },
-      { id: 4, title: "Concierto", description: "Concierto de música tradicional", date: "2025-03-15", category: "Información" },
-      { id: 5, title: "Paella Popular", description: "Evento gastronómico en la plaza", date: "2025-05-08", category: "Información" }
+      // FESTIVOS
+      { id: 1, title: "Año Nuevo", description: "Celebración del Año Nuevo", date: "2025-01-01", category: "Festivo" },
+      { id: 2, title: "Epifanía del Señor", description: "Celebración de la Epifanía", date: "2025-01-06", category: "Festivo" },
+      { id: 3, title: "San Vicente Mártir", description: "Festividad en honor a San Vicente", date: "2025-01-22", category: "Festivo" },
+      { id: 4, title: "San José", description: "Festividad en honor a San José", date: "2025-03-19", category: "Festivo" },
+      { id: 5, title: "Viernes Santo", description: "Celebración del Viernes Santo", date: "2025-04-18", category: "Festivo" },
+      { id: 6, title: "Lunes de Pascua", description: "Celebración del Lunes de Pascua", date: "2025-04-21", category: "Festivo" },
+      { id: 7, title: "San Vicente Ferrer", description: "Festividad en honor a San Vicente Ferrer", date: "2025-04-28", category: "Festivo" },
+      { id: 8, title: "Fiesta del Trabajo", description: "Celebración del Día del Trabajo", date: "2025-05-01", category: "Festivo" },
+      { id: 9, title: "San Juan", description: "Festividad en honor a San Juan", date: "2025-06-24", category: "Festivo" },
+      { id: 10, title: "Asunción de la Virgen", description: "Celebración de la Asunción", date: "2025-08-15", category: "Festivo" },
+      { id: 11, title: "Día de la C. Valenciana", description: "Fiesta de la Comunidad Valenciana", date: "2025-10-09", category: "Festivo" },
+      { id: 12, title: "Todos los Santos", description: "Festividad de Todos los Santos", date: "2025-11-01", category: "Festivo" },
+      { id: 13, title: "Día de la Constitución", description: "Celebración de la Constitución", date: "2025-12-06", category: "Festivo" },
+      { id: 14, title: "Inmaculada Concepción", description: "Celebración de la Inmaculada Concepción", date: "2025-12-08", category: "Festivo" },
+      { id: 15, title: "Navidad", description: "Celebración de la Navidad", date: "2025-12-25", category: "Festivo" },
+      // FALLA (Días de Fallas)
+      { id: 16, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-15", category: "Falla" },
+      { id: 17, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-16", category: "Falla" },
+      { id: 18, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-17", category: "Falla" },
+      { id: 19, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-18", category: "Falla" },
+      { id: 20, title: "San José", description: "Festividad y Fallas", date: "2025-03-19", category: "Falla" },
+      // EVENTOS
+      { id: 21, title: "San Valentín", description: "Día de San Valentín", date: "2025-02-14", category: "Evento" },
+      { id: 22, title: "Día Internacional de la Mujer", description: "Celebración del Día Internacional de la Mujer", date: "2025-03-08", category: "Evento" },
+      // URGENTE, INFORMACION, RECORDATORIO
+      { id: 23, title: "Aviso Urgente", description: "Aviso urgente para todos", date: "2025-04-05", category: "Urgente" },
+      { id: 24, title: "Información Importante", description: "Información relevante sobre el evento", date: "2025-04-07", category: "Informacion" },
+      { id: 25, title: "Recordatorio", description: "Recordatorio de evento", date: "2025-04-09", category: "Recordatorio" }
     ];
 
     const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
@@ -541,7 +595,7 @@
 
     /********************************************
      * Función: filtrarEventos
-     * Filtra los eventos según controles: búsqueda, categoría, fecha puntual,
+     * Filtra los eventos según los controles: búsqueda, categoría, fecha puntual,
      * día, mes, año y rango de fechas
      ********************************************/
     function filtrarEventos() {
@@ -566,24 +620,29 @@
 
       return eventos.filter(e => {
         let coincide = true;
+        // Búsqueda en título o descripción
         if (busqueda) {
           coincide = e.title.toLowerCase().includes(busqueda) ||
                      e.description.toLowerCase().includes(busqueda);
         }
+        // Filtro por año
         if (coincide && anoFiltro) {
           coincide = e.date.startsWith(anoFiltro);
         }
+        // Filtro por día
         if (coincide && diaFiltro) {
           const diaEvento = e.date.substring(8,10);
           coincide = (diaEvento === String(diaFiltro).padStart(2,"0"));
         }
+        // Filtro por categoría
         if (coincide && categoria) {
           coincide = (e.category === categoria);
         }
+        // Filtro por fecha puntual
         if (coincide && fechaPuntual) {
           coincide = (e.date === fechaPuntual);
         }
-
+        // Filtro por mes y rango (OR)
         let cumpleMes = true;
         if (mesFiltro) {
           const mesEvento = e.date.substring(5,7);
@@ -653,9 +712,15 @@
       }
       eventosFiltrados.forEach(e => {
         let claseModificador = '';
-        if (e.category === 'Urgente') {
+        if (e.category === 'Festivo') {
+          claseModificador = 'calendario-eventos__item--festivo';
+        } else if (e.category === 'Falla') {
+          claseModificador = 'calendario-eventos__item--falla';
+        } else if (e.category === 'Evento') {
+          claseModificador = 'calendario-eventos__item--evento';
+        } else if (e.category === 'Urgente') {
           claseModificador = 'calendario-eventos__item--urgente';
-        } else if (e.category === 'Información') {
+        } else if (e.category === 'Informacion') {
           claseModificador = 'calendario-eventos__item--informacion';
         } else if (e.category === 'Recordatorio') {
           claseModificador = 'calendario-eventos__item--recordatorio';
@@ -677,6 +742,7 @@
     /********************************************
      * Función: generarMiniCalendario
      * Genera el mini calendario (cuadrícula de días) con encabezados de la semana (lunes a domingo)
+     * y resalta los días según la categoría predominante de los eventos del día.
      ********************************************/
     function generarMiniCalendario(mes, anio, eventosFiltrados) {
       const contenedor = document.getElementById('mini-calendario');
@@ -703,48 +769,65 @@
       const hoyMes = hoy.getMonth();
       const hoyAnio = hoy.getFullYear();
 
-      // Celdas vacías por el offset
+      // Celdas vacías (offset)
       for (let i = 0; i < offset; i++) {
         const vacio = document.createElement('div');
         vacio.className = 'calendario-eventos__mini-dia';
         contenedor.appendChild(vacio);
       }
 
-      // Generar celdas para cada día
+      // Celdas para cada día
       for (let d = 1; d <= numDias; d++) {
         const celdaDia = document.createElement('div');
         celdaDia.className = 'calendario-eventos__mini-dia';
         celdaDia.textContent = d;
 
-        // Calcular el índice del día en la semana (0 = lunes, 6 = domingo)
+        // Determinar el índice del día (0 = lunes, 6 = domingo) basado en el offset
         const indiceDia = (offset + d - 1) % 7;
-        // Si es sábado (índice 5), añadir clase específica
-        if (indiceDia === 5) {
+        if (indiceDia === 5) { // sábado
           celdaDia.classList.add('fin-sabado');
         }
-        // Si es domingo (índice 6), añadir clase específica
-        if (indiceDia === 6) {
+        if (indiceDia === 6) { // domingo
           celdaDia.classList.add('fin-domingo');
         }
-
         // Marcar el día actual
         if (anio === hoyAnio && mes === hoyMes && d === hoyDia) {
           celdaDia.classList.add('hoy');
         }
 
         const fechaCelda = `${anio}-${String(mes + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-        // Eventos en ese día
+
+        // Obtener eventos del día
         const eventosDelDia = eventosFiltrados.filter(ev => ev.date === fechaCelda);
         if (eventosDelDia.length > 0) {
-          celdaDia.classList.add('destacado');
-          // Tooltip con títulos de eventos
+          // Determinar la categoría predominante según la siguiente prioridad:
+          // Festivo > Falla > Urgente > Informacion > Recordatorio > Evento
+          const categorias = eventosDelDia.map(ev => ev.category);
+          let claseCategoria = '';
+          if (categorias.includes("Festivo")) {
+            claseCategoria = 'mini-festivo';
+          } else if (categorias.includes("Falla")) {
+            claseCategoria = 'mini-falla';
+          } else if (categorias.includes("Urgente")) {
+            claseCategoria = 'mini-urgente';
+          } else if (categorias.includes("Informacion")) {
+            claseCategoria = 'mini-informacion';
+          } else if (categorias.includes("Recordatorio")) {
+            claseCategoria = 'mini-recordatorio';
+          } else if (categorias.includes("Evento")) {
+            claseCategoria = 'mini-evento';
+          }
+          if (claseCategoria) {
+            celdaDia.classList.add(claseCategoria);
+          }
+          // Tooltip con los títulos de los eventos
           const tooltip = document.createElement('div');
           tooltip.className = 'calendario-eventos__tooltip';
           tooltip.textContent = eventosDelDia.map(e => e.title).join(", ");
           celdaDia.appendChild(tooltip);
         }
 
-        // Si la fecha cae dentro del rango seleccionado, agregar clase 'en-rango'
+        // Si la celda cae dentro del rango seleccionado
         const rango = document.getElementById('filtro-rango-fecha').value;
         if (rango && rango.includes(" to ")) {
           const [inicio, fin] = rango.split(" to ");
@@ -756,7 +839,7 @@
           }
         }
 
-        // Al hacer clic en la celda, en modo avanzado, se rellenan los campos de día, mes y año
+        // Clic en la celda: en modo avanzado, se rellenan los campos de día, mes y año
         celdaDia.addEventListener('click', () => {
           const contenedorCalendario = document.getElementById('calendarioContenedor');
           if (!contenedorCalendario.classList.contains('modo-sencillo')) {
@@ -773,7 +856,7 @@
 
     /********************************************
      * Función: actualizarVista
-     * Actualiza filtros, mini calendario, lista y descripción de eventos
+     * Actualiza los filtros, mini calendario, lista y descripción de eventos
      ********************************************/
     function actualizarVista() {
       const filtrados = filtrarEventos();
@@ -789,7 +872,7 @@
       const eventosEsteMes = filtrados.filter(e => {
         const yearE = parseInt(e.date.substring(0,4));
         const monthE = parseInt(e.date.substring(5,7));
-        return (yearE === anio && monthE === (mes+1));
+        return (yearE === anio && monthE === (mes + 1));
       });
       mostrarDescripcionMes(eventosEsteMes, mes, anio);
       generarMiniCalendario(mes, anio, filtrados);
