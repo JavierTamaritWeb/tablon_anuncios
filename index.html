@@ -237,7 +237,7 @@
       cursor: pointer;
       position: relative;
     }
-    /* Colores para celdas según categoría (mini calendario) */
+    /* Colores para celdas según categoría (prioridad sobre fines de semana) */
     .calendario-eventos__mini-dia.mini-festivo {
       background-color: #FF6F61;
       color: #fff;
@@ -262,13 +262,16 @@
       background-color: #000080;
       color: #fff;
     }
-    /* Resaltar fines de semana */
+    /* Resaltar fines de semana solo si NO hay eventos */
+    .calendario-eventos__mini-dia:not(.mini-festivo):not(.mini-falla):not(.mini-evento):not(.mini-urgente):not(.mini-informacion):not(.mini-recordatorio) {
+      /* Asignar fines de semana según su posición */
+      /* Calcular índice de día ya lo hace la función, así que aquí se asume que se añadieron previamente solo si no hay evento */
+    }
+    /* Si se decide agregar clases para fines de semana, se pueden definir pero se deben ser removidas si hay evento */
     .calendario-eventos__mini-dia.fin-sabado {
-      /* Si no tiene categoría asignada, fondo gris claro */
       background-color: #e0e0e0;
     }
     .calendario-eventos__mini-dia.fin-domingo {
-      /* Si no tiene categoría asignada, fondo rosa claro y números en rojo */
       background-color: #ffcccc;
       color: red;
     }
@@ -330,7 +333,7 @@
       display: flex;
       justify-content: space-between;
     }
-    /* Modificadores para la vista de lista (eventos) */
+    /* Modificadores para vista de lista */
     .calendario-eventos__item--festivo {
       border-left: 6px solid #FF6F61;
     }
@@ -373,7 +376,7 @@
 
     <!-- Controles de filtrado -->
     <div class="calendario-eventos__controles">
-      <!-- Fila 1: Buscar, Rango de Fechas, Categoría (siempre visible) -->
+      <!-- Fila 1: Buscar, Rango de Fechas, Categoría -->
       <div class="calendario-eventos__fila fila-basica">
         <!-- Buscar -->
         <div class="calendario-eventos__control">
@@ -596,13 +599,12 @@
     /********************************************
      * Función: filtrarEventos
      * Filtra los eventos según los controles: búsqueda, categoría, fecha puntual,
-     * día, mes, año y rango de fechas
+     * día, mes, año y rango de fechas.
      ********************************************/
     function filtrarEventos() {
       const diaFiltro = document.getElementById('filtro-dia').value;
       const mesFiltro = document.getElementById('filtro-mes').value;
       const anoFiltro = document.getElementById('filtro-ano').value;
-
       const rango = document.getElementById('filtro-rango-fecha').value;
       let fechaInicio = "";
       let fechaFin = "";
@@ -613,7 +615,6 @@
           fechaFin = partes[1];
         }
       }
-
       const busqueda = document.getElementById('filtro-busqueda').value.toLowerCase();
       const categoria = document.getElementById('filtro-categoria').value;
       const fechaPuntual = document.getElementById('filtro-fecha').value;
@@ -705,9 +706,7 @@
           <p>No se han encontrado eventos que coincidan con los filtros seleccionados.</p>
           <button id="btn-reset-filtros">Borrar filtros</button>
         `;
-        document.getElementById('btn-reset-filtros').addEventListener('click', () => {
-          resetearFiltros();
-        });
+        document.getElementById('btn-reset-filtros').addEventListener('click', resetearFiltros);
         return;
       }
       eventosFiltrados.forEach(e => {
@@ -741,8 +740,8 @@
 
     /********************************************
      * Función: generarMiniCalendario
-     * Genera el mini calendario (cuadrícula de días) con encabezados de la semana (lunes a domingo)
-     * y resalta los días según la categoría predominante de los eventos del día.
+     * Genera el mini calendario (cuadrícula de días) con encabezados (lunes a domingo)
+     * Si en un día hay eventos, se aplicará la clase de categoría y NO se añadirán los estilos de fin de semana.
      ********************************************/
     function generarMiniCalendario(mes, anio, eventosFiltrados) {
       const contenedor = document.getElementById('mini-calendario');
@@ -760,7 +759,7 @@
       const numDias = new Date(anio, mes + 1, 0).getDate();
       // Primer día del mes (0 = domingo, 1 = lunes, etc.)
       const primerDia = new Date(anio, mes, 1).getDay();
-      // Calcular offset para que la semana empiece en lunes
+      // Calcular offset para que la semana empiece en lunes:
       const offset = (primerDia === 0) ? 6 : primerDia - 1;
 
       // Fecha actual
@@ -782,26 +781,11 @@
         celdaDia.className = 'calendario-eventos__mini-dia';
         celdaDia.textContent = d;
 
-        // Determinar el índice del día (0 = lunes, 6 = domingo) basado en el offset
-        const indiceDia = (offset + d - 1) % 7;
-        if (indiceDia === 5) { // sábado
-          celdaDia.classList.add('fin-sabado');
-        }
-        if (indiceDia === 6) { // domingo
-          celdaDia.classList.add('fin-domingo');
-        }
-        // Marcar el día actual
-        if (anio === hoyAnio && mes === hoyMes && d === hoyDia) {
-          celdaDia.classList.add('hoy');
-        }
-
+        // Si NO hay eventos en el día, se aplican estilos de fin de semana
         const fechaCelda = `${anio}-${String(mes + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-
-        // Obtener eventos del día
         const eventosDelDia = eventosFiltrados.filter(ev => ev.date === fechaCelda);
         if (eventosDelDia.length > 0) {
-          // Determinar la categoría predominante según la siguiente prioridad:
-          // Festivo > Falla > Urgente > Informacion > Recordatorio > Evento
+          // Asignar clase según la categoría predominante.
           const categorias = eventosDelDia.map(ev => ev.category);
           let claseCategoria = '';
           if (categorias.includes("Festivo")) {
@@ -820,11 +804,20 @@
           if (claseCategoria) {
             celdaDia.classList.add(claseCategoria);
           }
-          // Tooltip con los títulos de los eventos
-          const tooltip = document.createElement('div');
-          tooltip.className = 'calendario-eventos__tooltip';
-          tooltip.textContent = eventosDelDia.map(e => e.title).join(", ");
-          celdaDia.appendChild(tooltip);
+        } else {
+          // Si no hay eventos, aplicar estilos de fin de semana según índice
+          const indiceDia = (offset + d - 1) % 7;
+          if (indiceDia === 5) { // sábado
+            celdaDia.classList.add('fin-sabado');
+          }
+          if (indiceDia === 6) { // domingo
+            celdaDia.classList.add('fin-domingo');
+          }
+        }
+
+        // Marcar el día actual
+        if (anio === hoyAnio && mes === hoyMes && d === hoyDia) {
+          celdaDia.classList.add('hoy');
         }
 
         // Si la celda cae dentro del rango seleccionado
@@ -861,7 +854,6 @@
     function actualizarVista() {
       const filtrados = filtrarEventos();
       renderizarLista(filtrados);
-      // Determinar mes y año de referencia: del filtro o de la fecha actual
       let mes = new Date().getMonth();
       let anio = new Date().getFullYear();
       const mesFiltro = document.getElementById('filtro-mes').value;
