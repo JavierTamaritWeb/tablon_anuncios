@@ -85,9 +85,10 @@
     */
     .calendario-eventos__fila {
       display: grid;
-      gap: 1rem;
+      gap: 5rem; /* Aumentado a 5rem */
       margin-bottom: 1rem;
     }
+
     /* 
       En pantallas muy pequeñas, 1 columna
       En pantallas medianas, 2 columnas
@@ -165,9 +166,10 @@
       display: inline-block;
       width: 100%;
     }
+    /* Aumentamos el padding-right a 4rem para no solapar la X */
     .calendario-eventos__control-fecha {
       width: 100%;
-      padding-right: 3rem; /* Espacio para la 'X' */
+      padding-right: 4rem; /* Antes 3rem, ahora 4rem */
     }
     .calendario-eventos__control-fecha::-webkit-calendar-picker-indicator {
       position: absolute;
@@ -178,9 +180,10 @@
     .calendario-eventos__control-fecha-wrapper:hover .calendario-eventos__control-fecha::-webkit-calendar-picker-indicator {
       filter: invert(100%);
     }
+    /* Movemos la X un poco más a la izquierda: right: 1rem */
     .calendario-eventos__control-fecha-borrar {
       position: absolute;
-      right: 0.5rem;
+      right: 1rem; /* Ajuste para no solapar el texto */
       top: 50%;
       transform: translateY(-50%);
       background: transparent;
