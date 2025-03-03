@@ -237,7 +237,7 @@
       cursor: pointer;
       position: relative;
     }
-    /* Colores para celdas según categoría (prioridad sobre fines de semana) */
+    /* Estilos de categorías en el mini calendario */
     .calendario-eventos__mini-dia.mini-festivo {
       background-color: #FF6F61;
       color: #fff;
@@ -262,12 +262,10 @@
       background-color: #000080;
       color: #fff;
     }
-    /* Resaltar fines de semana solo si NO hay eventos */
+    /* Si no hay eventos, aplicar estilos de fin de semana */
     .calendario-eventos__mini-dia:not(.mini-festivo):not(.mini-falla):not(.mini-evento):not(.mini-urgente):not(.mini-informacion):not(.mini-recordatorio) {
-      /* Asignar fines de semana según su posición */
-      /* Calcular índice de día ya lo hace la función, así que aquí se asume que se añadieron previamente solo si no hay evento */
+      /* Se asigna según el día de la semana */
     }
-    /* Si se decide agregar clases para fines de semana, se pueden definir pero se deben ser removidas si hay evento */
     .calendario-eventos__mini-dia.fin-sabado {
       background-color: #e0e0e0;
     }
@@ -333,7 +331,7 @@
       display: flex;
       justify-content: space-between;
     }
-    /* Modificadores para vista de lista */
+    /* Modificadores para vista de lista (según categoría) */
     .calendario-eventos__item--festivo {
       border-left: 6px solid #FF6F61;
     }
@@ -513,10 +511,11 @@
   <script>
     /********************************************
      * Datos de ejemplo para 2025 (en Valencia)
-     * Se definen los eventos con sus respectivas categorías:
-     *   - Festivo, Falla, Evento, Urgente, Informacion, Recordatorio
+     * Se definen eventos con sus respectivas categorías:
+     * - Festivo, Falla, Evento, Urgente, Informacion, Recordatorio
      ********************************************/
     const eventos = [
+      // EVENTOS 2025
       // FESTIVOS
       { id: 1, title: "Año Nuevo", description: "Celebración del Año Nuevo", date: "2025-01-01", category: "Festivo" },
       { id: 2, title: "Epifanía del Señor", description: "Celebración de la Epifanía", date: "2025-01-06", category: "Festivo" },
@@ -533,19 +532,46 @@
       { id: 13, title: "Día de la Constitución", description: "Celebración de la Constitución", date: "2025-12-06", category: "Festivo" },
       { id: 14, title: "Inmaculada Concepción", description: "Celebración de la Inmaculada Concepción", date: "2025-12-08", category: "Festivo" },
       { id: 15, title: "Navidad", description: "Celebración de la Navidad", date: "2025-12-25", category: "Festivo" },
-      // FALLA (Días de Fallas)
+      // FALLA (2025)
       { id: 16, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-15", category: "Falla" },
       { id: 17, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-16", category: "Falla" },
       { id: 18, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-17", category: "Falla" },
       { id: 19, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-18", category: "Falla" },
       { id: 20, title: "San José", description: "Festividad y Fallas", date: "2025-03-19", category: "Falla" },
-      // EVENTOS
+      // EVENTOS (2025)
       { id: 21, title: "San Valentín", description: "Día de San Valentín", date: "2025-02-14", category: "Evento" },
       { id: 22, title: "Día Internacional de la Mujer", description: "Celebración del Día Internacional de la Mujer", date: "2025-03-08", category: "Evento" },
-      // URGENTE, INFORMACION, RECORDATORIO
+      // URGENTE, INFORMACION, RECORDATORIO (2025)
       { id: 23, title: "Aviso Urgente", description: "Aviso urgente para todos", date: "2025-04-05", category: "Urgente" },
       { id: 24, title: "Información Importante", description: "Información relevante sobre el evento", date: "2025-04-07", category: "Informacion" },
-      { id: 25, title: "Recordatorio", description: "Recordatorio de evento", date: "2025-04-09", category: "Recordatorio" }
+      { id: 25, title: "Recordatorio", description: "Recordatorio de evento", date: "2025-04-09", category: "Recordatorio" },
+
+      // EVENTOS 2026
+      // FESTIVOS 2026
+      { id: 26, title: "Año Nuevo", description: "Celebración del Año Nuevo", date: "2026-01-01", category: "Festivo" },
+      { id: 27, title: "Epifanía del Señor", description: "Celebración de la Epifanía", date: "2026-01-06", category: "Festivo" },
+      { id: 28, title: "San Vicente Mártir", description: "Festividad en honor a San Vicente", date: "2026-01-22", category: "Festivo" },
+      { id: 29, title: "San José", description: "Festividad en honor a San José", date: "2026-03-19", category: "Festivo" },
+      { id: 30, title: "Viernes Santo", description: "Celebración del Viernes Santo", date: "2026-04-03", category: "Festivo" },
+      { id: 31, title: "Lunes de Pascua", description: "Celebración del Lunes de Pascua", date: "2026-04-06", category: "Festivo" },
+      { id: 32, title: "San Vicente Ferrer", description: "Festividad en honor a San Vicente Ferrer", date: "2026-04-28", category: "Festivo" },
+      { id: 33, title: "Fiesta del Trabajo", description: "Celebración del Día del Trabajo", date: "2026-05-01", category: "Festivo" },
+      { id: 34, title: "San Juan", description: "Festividad en honor a San Juan", date: "2026-06-24", category: "Festivo" },
+      { id: 35, title: "Asunción de la Virgen", description: "Celebración de la Asunción", date: "2026-08-15", category: "Festivo" },
+      { id: 36, title: "Día de la C. Valenciana", description: "Fiesta de la Comunidad Valenciana", date: "2026-10-09", category: "Festivo" },
+      { id: 37, title: "Todos los Santos", description: "Festividad de Todos los Santos", date: "2026-11-01", category: "Festivo" },
+      { id: 38, title: "Día de la Constitución", description: "Celebración de la Constitución", date: "2026-12-06", category: "Festivo" },
+      { id: 39, title: "Inmaculada Concepción", description: "Celebración de la Inmaculada Concepción", date: "2026-12-08", category: "Festivo" },
+      { id: 40, title: "Navidad", description: "Celebración de la Navidad", date: "2026-12-25", category: "Festivo" },
+      // FALLA 2026
+      { id: 41, title: "Fallas", description: "Celebración de Fallas", date: "2026-03-15", category: "Falla" },
+      { id: 42, title: "Fallas", description: "Celebración de Fallas", date: "2026-03-16", category: "Falla" },
+      { id: 43, title: "Fallas", description: "Celebración de Fallas", date: "2026-03-17", category: "Falla" },
+      { id: 44, title: "Fallas", description: "Celebración de Fallas", date: "2026-03-18", category: "Falla" },
+      { id: 45, title: "San José", description: "Festividad y Fallas", date: "2026-03-19", category: "Falla" },
+      // EVENTOS 2026
+      { id: 46, title: "San Valentín", description: "Día de San Valentín", date: "2026-02-14", category: "Evento" },
+      { id: 47, title: "Día Internacional de la Mujer", description: "Celebración del Día Internacional de la Mujer", date: "2026-03-08", category: "Evento" }
     ];
 
     const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
@@ -706,7 +732,9 @@
           <p>No se han encontrado eventos que coincidan con los filtros seleccionados.</p>
           <button id="btn-reset-filtros">Borrar filtros</button>
         `;
-        document.getElementById('btn-reset-filtros').addEventListener('click', resetearFiltros);
+        document.getElementById('btn-reset-filtros').addEventListener('click', () => {
+          resetearFiltros();
+        });
         return;
       }
       eventosFiltrados.forEach(e => {
@@ -740,8 +768,9 @@
 
     /********************************************
      * Función: generarMiniCalendario
-     * Genera el mini calendario (cuadrícula de días) con encabezados (lunes a domingo)
-     * Si en un día hay eventos, se aplicará la clase de categoría y NO se añadirán los estilos de fin de semana.
+     * Genera el mini calendario (cuadrícula de días) con encabezados (lunes a domingo).
+     * Si hay eventos en un día, se aplica la clase según la categoría; de lo contrario,
+     * se aplican estilos de fin de semana (sábado y domingo).
      ********************************************/
     function generarMiniCalendario(mes, anio, eventosFiltrados) {
       const contenedor = document.getElementById('mini-calendario');
@@ -754,58 +783,52 @@
         celda.textContent = dia;
         contenedor.appendChild(celda);
       });
-
       // Número de días en el mes
       const numDias = new Date(anio, mes + 1, 0).getDate();
       // Primer día del mes (0 = domingo, 1 = lunes, etc.)
       const primerDia = new Date(anio, mes, 1).getDay();
       // Calcular offset para que la semana empiece en lunes:
       const offset = (primerDia === 0) ? 6 : primerDia - 1;
-
       // Fecha actual
       const hoy = new Date();
       const hoyDia = hoy.getDate();
       const hoyMes = hoy.getMonth();
       const hoyAnio = hoy.getFullYear();
-
-      // Celdas vacías (offset)
+      // Celdas vacías para alinear el primer día
       for (let i = 0; i < offset; i++) {
         const vacio = document.createElement('div');
         vacio.className = 'calendario-eventos__mini-dia';
         contenedor.appendChild(vacio);
       }
-
       // Celdas para cada día
       for (let d = 1; d <= numDias; d++) {
         const celdaDia = document.createElement('div');
         celdaDia.className = 'calendario-eventos__mini-dia';
         celdaDia.textContent = d;
-
-        // Si NO hay eventos en el día, se aplican estilos de fin de semana
         const fechaCelda = `${anio}-${String(mes + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        // Si hay eventos en ese día, aplicar la clase según la categoría (prioritaria)
         const eventosDelDia = eventosFiltrados.filter(ev => ev.date === fechaCelda);
         if (eventosDelDia.length > 0) {
-          // Asignar clase según la categoría predominante.
-          const categorias = eventosDelDia.map(ev => ev.category);
-          let claseCategoria = '';
-          if (categorias.includes("Festivo")) {
-            claseCategoria = 'mini-festivo';
-          } else if (categorias.includes("Falla")) {
-            claseCategoria = 'mini-falla';
-          } else if (categorias.includes("Urgente")) {
-            claseCategoria = 'mini-urgente';
-          } else if (categorias.includes("Informacion")) {
-            claseCategoria = 'mini-informacion';
-          } else if (categorias.includes("Recordatorio")) {
-            claseCategoria = 'mini-recordatorio';
-          } else if (categorias.includes("Evento")) {
-            claseCategoria = 'mini-evento';
+          if (eventosDelDia.some(ev => ev.category === 'Festivo')) {
+            celdaDia.classList.add('mini-festivo');
+          } else if (eventosDelDia.some(ev => ev.category === 'Falla')) {
+            celdaDia.classList.add('mini-falla');
+          } else if (eventosDelDia.some(ev => ev.category === 'Evento')) {
+            celdaDia.classList.add('mini-evento');
+          } else if (eventosDelDia.some(ev => ev.category === 'Urgente')) {
+            celdaDia.classList.add('mini-urgente');
+          } else if (eventosDelDia.some(ev => ev.category === 'Informacion')) {
+            celdaDia.classList.add('mini-informacion');
+          } else if (eventosDelDia.some(ev => ev.category === 'Recordatorio')) {
+            celdaDia.classList.add('mini-recordatorio');
           }
-          if (claseCategoria) {
-            celdaDia.classList.add(claseCategoria);
-          }
+          // Tooltip con los títulos de los eventos
+          const tooltip = document.createElement('div');
+          tooltip.className = 'calendario-eventos__tooltip';
+          tooltip.textContent = eventosDelDia.map(e => e.title).join(", ");
+          celdaDia.appendChild(tooltip);
         } else {
-          // Si no hay eventos, aplicar estilos de fin de semana según índice
+          // Si no hay eventos, aplicar estilos de fin de semana según el día de la semana
           const indiceDia = (offset + d - 1) % 7;
           if (indiceDia === 5) { // sábado
             celdaDia.classList.add('fin-sabado');
@@ -814,24 +837,10 @@
             celdaDia.classList.add('fin-domingo');
           }
         }
-
         // Marcar el día actual
         if (anio === hoyAnio && mes === hoyMes && d === hoyDia) {
           celdaDia.classList.add('hoy');
         }
-
-        // Si la celda cae dentro del rango seleccionado
-        const rango = document.getElementById('filtro-rango-fecha').value;
-        if (rango && rango.includes(" to ")) {
-          const [inicio, fin] = rango.split(" to ");
-          const dObj = toDateObj(fechaCelda);
-          const iniObj = toDateObj(inicio);
-          const finObj = toDateObj(fin);
-          if (iniObj && finObj && dObj >= iniObj && dObj <= finObj) {
-            celdaDia.classList.add('en-rango');
-          }
-        }
-
         // Clic en la celda: en modo avanzado, se rellenan los campos de día, mes y año
         celdaDia.addEventListener('click', () => {
           const contenedorCalendario = document.getElementById('calendarioContenedor');
@@ -842,14 +851,13 @@
             actualizarVista();
           }
         });
-
         contenedor.appendChild(celdaDia);
       }
     }
 
     /********************************************
      * Función: actualizarVista
-     * Actualiza los filtros, mini calendario, lista y descripción de eventos
+     * Actualiza la vista (filtros, mini calendario, lista y descripción de eventos)
      ********************************************/
     function actualizarVista() {
       const filtrados = filtrarEventos();
