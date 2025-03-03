@@ -4,14 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calendario de Eventos - Falla Suïssa</title>
-  
-  <!-- Flatpickr CSS para el date range picker -->
+
+  <!-- Flatpickr CSS (para el Date Range Picker) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  
+
   <style>
-    /* ==========================
-       BLOQUE: calendario-eventos
-       ========================== */
+    /* ============= BLOQUE: calendario-eventos ============= */
     .calendario-eventos {
       max-width: 900px;
       margin: 2rem auto;
@@ -21,38 +19,109 @@
       border-radius: 8px;
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       font-family: Arial, sans-serif;
+      position: relative;
     }
     .calendario-eventos__cabecera {
       text-align: center;
       margin-bottom: 1.5rem;
+      position: relative;
     }
     .calendario-eventos__cabecera-titulo {
       font-size: 2.5rem;
       color: #ff6f61; /* primary-color */
       margin: 0;
     }
-    
-    /* ===== CONTROLES DE FILTRO ===== */
+
+    /* Botón "Quitar Filtros" (Ver Todo) en la parte superior derecha */
+    .calendario-eventos__boton-quitar {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background-color: #fff;
+      color: #333;
+      border: 1px solid #333;
+      border-radius: 5px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .calendario-eventos__boton-quitar:hover {
+      background-color: black;
+      color: white;
+    }
+
+    /* ===== MODO SENCILLO / AVANZADO ===== */
+    .calendario-eventos__modo {
+      text-align: right;
+      margin-bottom: 1rem;
+    }
+    .calendario-eventos__modo-boton {
+      background-color: #fff;
+      color: #333;
+      border: 1px solid #333;
+      border-radius: 5px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .calendario-eventos__modo-boton:hover {
+      background-color: black;
+      color: white;
+    }
+
+    /* ============= CONTROLES DE FILTRO ============= */
     .calendario-eventos__controles {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: center;
       margin-bottom: 1.5rem;
     }
+
+    /* 
+      Cada fila es un contenedor grid independiente.
+      Se han creado 3 filas:
+        - Fila 1: (Buscar, Rango, Categoría)
+        - Fila 2: (Fecha puntual) => Avanzado
+        - Fila 3: (Día, Mes, Año) => Avanzado
+    */
+    .calendario-eventos__fila {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    /* 
+      En pantallas muy pequeñas, 1 columna
+      En pantallas medianas, 2 columnas
+      En pantallas grandes, 3 columnas
+    */
+    @media (max-width: 480px) {
+      .calendario-eventos__fila {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (min-width: 481px) and (max-width: 768px) {
+      .calendario-eventos__fila {
+        grid-template-columns: repeat(2, minmax(150px, 1fr));
+      }
+    }
+    @media (min-width: 769px) {
+      .calendario-eventos__fila {
+        grid-template-columns: repeat(3, minmax(150px, 1fr));
+      }
+    }
+
     .calendario-eventos__control {
       display: flex;
       flex-direction: column;
-      align-items: center;
       font-size: 0.9rem;
       color: #333;
     }
     .calendario-eventos__control label {
       margin-bottom: 0.3rem;
     }
-    .calendario-eventos__control-select,
+    .calendario-eventos__control-texto,
     .calendario-eventos__control-fecha,
     .calendario-eventos__control-busqueda {
+      width: 100%;
       padding: 0.75rem 1rem;
       font-size: 1rem;
       border: 1px solid #333;
@@ -61,29 +130,36 @@
       color: #333;
       transition: background-color 0.3s ease, color 0.3s ease;
     }
-    .calendario-eventos__control-select:hover,
+    .calendario-eventos__control-texto:hover,
     .calendario-eventos__control-fecha:hover,
     .calendario-eventos__control-busqueda:hover {
       background-color: black;
       color: white;
     }
-    /* Botón para reiniciar todos los filtros */
-    .calendario-eventos__control-reiniciar {
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      border: 1px solid #333;
-      border-radius: 5px;
-      background-color: #fff;
+
+    /* Botón de borrar en Día, Mes, Año */
+    .calendario-eventos__borrar-campo {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
       color: #333;
       cursor: pointer;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: color 0.3s ease;
     }
-    .calendario-eventos__control-reiniciar:hover {
-      background-color: black;
-      color: white;
+    .calendario-eventos__borrar-campo:hover {
+      color: red;
     }
-    
-    /* Contenedor para el date range picker */
+    .calendario-eventos__campo-wrapper {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+
+    /* ============= RANGO DE FECHAS (Flatpickr) ============= */
     .calendario-eventos__control-fecha-wrapper {
       position: relative;
       display: inline-block;
@@ -91,9 +167,7 @@
     }
     .calendario-eventos__control-fecha {
       width: 100%;
-      padding-right: 3rem; /* Espacio para el botón de limpiar */
-      /* Aunque los inputs de tipo date no muestran placeholder en algunos navegadores, se incluye */
-      placeholder: "YYYY-MM-DD a YYYY-MM-DD";
+      padding-right: 3rem; /* Espacio para la 'X' */
     }
     .calendario-eventos__control-fecha::-webkit-calendar-picker-indicator {
       position: absolute;
@@ -119,8 +193,8 @@
     .calendario-eventos__control-fecha-wrapper:hover .calendario-eventos__control-fecha-borrar {
       color: white;
     }
-    
-    /* ===== LEYENDA Y DESCRIPCIÓN ===== */
+
+    /* ============= LEYENDA Y DESCRIPCIÓN ============= */
     .calendario-eventos__leyenda {
       margin: 1rem 0;
       font-size: 1.2rem;
@@ -148,14 +222,15 @@
     .calendario-eventos__detalles-mes li {
       margin-bottom: 0.5rem;
     }
-    
-    /* ===== MINI CALENDARIO (vista en cuadrícula) ===== */
+
+    /* ============= MINI CALENDARIO ============= */
     .calendario-eventos__mini {
       margin: 1rem 0;
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 0.5rem;
       text-align: center;
+      position: relative;
     }
     .calendario-eventos__mini-encabezado {
       font-weight: bold;
@@ -168,6 +243,26 @@
       border: 1px solid #fdfdfd;
       transition: background-color 0.3s ease;
       cursor: pointer;
+      position: relative;
+    }
+    .calendario-eventos__tooltip {
+      visibility: hidden;
+      opacity: 0;
+      position: absolute;
+      bottom: 105%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: opacity 0.3s ease;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .calendario-eventos__mini-dia:hover .calendario-eventos__tooltip {
+      visibility: visible;
+      opacity: 1;
     }
     .calendario-eventos__mini-dia.destacado {
       background-color: #ff6f61;
@@ -177,8 +272,11 @@
       background: linear-gradient(45deg, #ff6f61, #ff9a7d);
       color: #fff;
     }
-    
-    /* ===== LISTA DE ANUNCIOS (eventos) ===== */
+    .calendario-eventos__mini-dia.hoy {
+      outline: 2px solid blue;
+    }
+
+    /* ============= LISTA DE ANUNCIOS ============= */
     .calendario-eventos__lista {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -211,8 +309,7 @@
       display: flex;
       justify-content: space-between;
     }
-    
-    /* ===== MODIFICADORES DE CATEGORÍA ===== */
+    /* MODIFICADORES DE CATEGORÍA */
     .calendario-eventos__item--urgente {
       border-left: 6px solid red;
     }
@@ -222,152 +319,142 @@
     .calendario-eventos__item--recordatorio {
       border-left: 6px solid orange;
     }
-    
-    /* ===== RESPONSIVIDAD ===== */
-    @media (max-width: 480px) {
-      .calendario-eventos {
-        padding: 1rem;
-        margin: 0.5rem;
-      }
-      .calendario-eventos__cabecera-titulo {
-        font-size: 1.75rem;
-      }
-      .calendario-eventos__controles {
-        flex-direction: column;
-        align-items: center;
-      }
-      .calendario-eventos__control-select,
-      .calendario-eventos__control-fecha,
-      .calendario-eventos__control-busqueda {
-        width: 100%;
-      }
-      .calendario-eventos__detalles-mes h2 {
-        font-size: 1.1rem;
-      }
-      .calendario-eventos__item-meta {
-        font-size: 0.8rem;
-      }
-      .calendario-eventos__mini {
-        grid-template-columns: repeat(7, 1fr);
-        font-size: 0.8rem;
-      }
-    }
-    @media (min-width: 481px) and (max-width: 768px) {
-      .calendario-eventos {
-        padding: 1.5rem;
-        margin: 1rem;
-      }
-      .calendario-eventos__cabecera-titulo {
-        font-size: 2rem;
-      }
-      .calendario-eventos__control-select,
-      .calendario-eventos__control-fecha,
-      .calendario-eventos__control-busqueda {
-        width: 100%;
-        max-width: 300px;
-      }
-      .calendario-eventos__lista {
-        grid-template-columns: 1fr;
-      }
-    }
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .calendario-eventos {
-        max-width: 800px;
-        padding: 1.75rem;
-      }
-      .calendario-eventos__cabecera-titulo {
-        font-size: 2.25rem;
-      }
-      .calendario-eventos__lista {
-        gap: 1rem;
-      }
-    }
-    @media (min-width: 1025px) and (max-width: 1200px) {
-      .calendario-eventos {
-        max-width: 900px;
-        padding: 2rem;
-      }
-      .calendario-eventos__cabecera-titulo {
-        font-size: 2.5rem;
-      }
-      .calendario-eventos__lista {
-        gap: 1.5rem;
-      }
+
+    /* ============= MODO SENCILLO/AVANZADO ============= */
+    /* Modo sencillo: oculta las filas 2 y 3 */
+    .modo-sencillo .avanzado {
+      display: none;
     }
   </style>
-  
-  <!-- Flatpickr JS -->
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
-  <div class="calendario-eventos">
+  <div class="calendario-eventos modo-sencillo" id="calendarioContenedor">
+    <!-- Botón para “Ver Todo” (Quitar Filtros) en la parte superior derecha -->
+    <button class="calendario-eventos__boton-quitar" id="botonQuitarFiltros">Quitar Filtros (Alt+R)</button>
+
     <header class="calendario-eventos__cabecera">
       <h1 class="calendario-eventos__cabecera-titulo">Calendario de Eventos</h1>
     </header>
 
-    <!-- Controles de filtrado -->
+    <!-- Botón para alternar modo Sencillo / Avanzado -->
+    <div class="calendario-eventos__modo">
+      <button class="calendario-eventos__modo-boton" id="botonModo">Cambiar a Modo Avanzado</button>
+    </div>
+
+    <!-- Controles de filtrado, divididos en 3 filas -->
     <div class="calendario-eventos__controles">
-      <div class="calendario-eventos__control">
-        <label for="filtro-dia">Día</label>
-        <select id="filtro-dia" class="calendario-eventos__control-select">
-          <option value="">Todos</option>
-        </select>
-      </div>
-      <div class="calendario-eventos__control">
-        <label for="filtro-mes">Mes</label>
-        <select id="filtro-mes" class="calendario-eventos__control-select">
-          <option value="">Todos</option>
-          <option value="1">Enero</option>
-          <option value="2">Febrero</option>
-          <option value="3">Marzo</option>
-          <option value="4">Abril</option>
-          <option value="5">Mayo</option>
-          <option value="6">Junio</option>
-          <option value="7">Julio</option>
-          <option value="8">Agosto</option>
-          <option value="9">Septiembre</option>
-          <option value="10">Octubre</option>
-          <option value="11">Noviembre</option>
-          <option value="12">Diciembre</option>
-        </select>
-      </div>
-      <div class="calendario-eventos__control">
-        <label for="filtro-ano">Año</label>
-        <select id="filtro-ano" class="calendario-eventos__control-select">
-          <option value="">Todos</option>
-        </select>
-      </div>
-      <!-- Nuevo control: Date Range Picker en lugar de "Desde" y "Hasta" separados -->
-      <div class="calendario-eventos__control">
-        <label for="filtro-rango-fecha">Rango de fechas</label>
-        <div class="calendario-eventos__control-fecha-wrapper">
-          <input type="text" id="filtro-rango-fecha" class="calendario-eventos__control-fecha" placeholder="YYYY-MM-DD a YYYY-MM-DD" required>
-          <button id="borrar-rango-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
+
+      <!-- Fila 1: Buscar, Rango Fechas, Categoría (siempre visible) -->
+      <div class="calendario-eventos__fila fila-basica">
+        <!-- Buscar -->
+        <div class="calendario-eventos__control">
+          <label for="filtro-busqueda">Buscar</label>
+          <input 
+            type="text" 
+            id="filtro-busqueda" 
+            class="calendario-eventos__control-busqueda" 
+            placeholder="Palabras clave"
+          >
+        </div>
+        <!-- Rango de Fechas -->
+        <div class="calendario-eventos__control">
+          <label for="filtro-rango-fecha">Rango de fechas</label>
+          <div class="calendario-eventos__control-fecha-wrapper">
+            <input 
+              type="text" 
+              id="filtro-rango-fecha" 
+              class="calendario-eventos__control-fecha" 
+              placeholder="YYYY-MM-DD a YYYY-MM-DD"
+              required
+            >
+            <button id="borrar-rango-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
+          </div>
+        </div>
+        <!-- Categoría -->
+        <div class="calendario-eventos__control">
+          <label for="filtro-categoria">Categoría</label>
+          <select 
+            id="filtro-categoria" 
+            class="calendario-eventos__control-texto"
+          >
+            <option value="">Todas</option>
+            <option value="Urgente">Urgente</option>
+            <option value="Información">Información</option>
+            <option value="Recordatorio">Recordatorio</option>
+          </select>
         </div>
       </div>
-      <div class="calendario-eventos__control">
-        <label for="filtro-busqueda">Buscar</label>
-        <input type="text" id="filtro-busqueda" class="calendario-eventos__control-busqueda" placeholder="Palabras clave">
-      </div>
-      <div class="calendario-eventos__control">
-        <label for="filtro-categoria">Categoría</label>
-        <select id="filtro-categoria" class="calendario-eventos__control-select">
-          <option value="">Todas</option>
-          <option value="Urgente">Urgente</option>
-          <option value="Información">Información</option>
-          <option value="Recordatorio">Recordatorio</option>
-        </select>
-      </div>
-      <div class="calendario-eventos__control">
-        <label for="filtro-fecha">Fecha puntual</label>
-        <div class="calendario-eventos__control-fecha-wrapper">
-          <input type="date" id="filtro-fecha" class="calendario-eventos__control-fecha" placeholder="YYYY-MM-DD">
-          <button id="borrar-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
+
+      <!-- Fila 2: Fecha puntual (modo avanzado) -->
+      <div class="calendario-eventos__fila fila-avanzada avanzado">
+        <!-- Fecha puntual -->
+        <div class="calendario-eventos__control">
+          <label for="filtro-fecha">Fecha puntual</label>
+          <div class="calendario-eventos__control-fecha-wrapper">
+            <input 
+              type="date" 
+              id="filtro-fecha" 
+              class="calendario-eventos__control-fecha" 
+              placeholder="YYYY-MM-DD"
+            >
+            <button id="borrar-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
+          </div>
         </div>
       </div>
-      <!-- Botón para reiniciar todos los filtros -->
-      <div class="calendario-eventos__control">
-        <button id="resetear-filtros" class="calendario-eventos__control-reiniciar">Ver Todo</button>
+
+      <!-- Fila 3: Día, Mes, Año (modo avanzado) -->
+      <div class="calendario-eventos__fila fila-avanzada avanzado">
+        <!-- Día (2 dígitos) -->
+        <div class="calendario-eventos__control">
+          <label for="filtro-dia">Día (2 dígitos)</label>
+          <div class="calendario-eventos__campo-wrapper">
+            <input 
+              type="text" 
+              id="filtro-dia"
+              class="calendario-eventos__control-texto"
+              placeholder="DD"
+              maxlength="2"
+              pattern="^\\d{1,2}$"
+              inputmode="numeric"
+              title="Día entre 01 y 31"
+            >
+            <button class="calendario-eventos__borrar-campo" id="borrar-dia">✕</button>
+          </div>
+        </div>
+        <!-- Mes (2 dígitos) -->
+        <div class="calendario-eventos__control">
+          <label for="filtro-mes">Mes (2 dígitos)</label>
+          <div class="calendario-eventos__campo-wrapper">
+            <input 
+              type="text" 
+              id="filtro-mes"
+              class="calendario-eventos__control-texto"
+              placeholder="MM"
+              maxlength="2"
+              pattern="^\\d{1,2}$"
+              inputmode="numeric"
+              title="Mes entre 01 y 12"
+            >
+            <button class="calendario-eventos__borrar-campo" id="borrar-mes">✕</button>
+          </div>
+        </div>
+        <!-- Año (4 dígitos) -->
+        <div class="calendario-eventos__control">
+          <label for="filtro-ano">Año (4 dígitos)</label>
+          <div class="calendario-eventos__campo-wrapper">
+            <input 
+              type="text" 
+              id="filtro-ano"
+              class="calendario-eventos__control-texto"
+              placeholder="YYYY"
+              maxlength="4"
+              pattern="^\\d{4}$"
+              inputmode="numeric"
+              title="Introduzca 4 dígitos (p.ej. 2025)"
+            >
+            <button class="calendario-eventos__borrar-campo" id="borrar-ano">✕</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -380,15 +467,14 @@
     </div>
 
     <!-- Descripción detallada de los eventos del mes -->
-    <div class="calendario-eventos__detalles-mes" id="descripcion-eventos-mes">
-      <!-- Listado de eventos del mes en forma de bullet list -->
-    </div>
+    <div class="calendario-eventos__detalles-mes" id="descripcion-eventos-mes"></div>
 
     <!-- Lista de anuncios (eventos filtrados) -->
-    <div class="calendario-eventos__lista" id="lista-anuncios">
-      <!-- Se inyectan dinámicamente -->
-    </div>
+    <div class="calendario-eventos__lista" id="lista-anuncios"></div>
   </div>
+
+  <!-- Flatpickr JS (Date Range Picker) -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
   <script>
     /********************************************
@@ -401,11 +487,11 @@
       { id: 4, title: "Concierto", description: "Concierto de música tradicional", date: "2025-03-15", category: "Información" },
       { id: 5, title: "Paella Popular", description: "Evento gastronómico en la plaza", date: "2025-05-08", category: "Información" }
     ];
-    
+
     const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-    
+
     /********************************************
-     * Inicialización de Flatpickr para el rango
+     * Flatpickr para el rango
      ********************************************/
     flatpickr("#filtro-rango-fecha", {
       mode: "range",
@@ -414,23 +500,18 @@
         actualizarVista();
       }
     });
-    
-    // Evento "invalid" para mostrar mensaje si la fecha es inválida
-    document.getElementById("filtro-rango-fecha").addEventListener("invalid", function(e) {
-      alert("Formato inválido, use YYYY-MM-DD a YYYY-MM-DD");
-    });
-    
+
     /********************************************
-     * Función toDateObj: Convierte 'yyyy-mm-dd' a objeto Date
+     * toDateObj: Convierte 'yyyy-mm-dd' a objeto Date
      ********************************************/
     function toDateObj(str) {
       if (!str || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return null;
       const [yyyy, mm, dd] = str.split("-").map(Number);
       return new Date(yyyy, mm - 1, dd);
     }
-    
+
     /********************************************
-     * Función para comprobar si e.date está en un rango
+     * cumpleRango: Verifica si e.date está en [ini, fin]
      ********************************************/
     function cumpleRango(eDateStr, fechaInicio, fechaFin) {
       const eDate = toDateObj(eDateStr);
@@ -441,15 +522,16 @@
       if (finDate && eDate > finDate) return false;
       return true;
     }
-    
+
     /********************************************
-     * Filtrar eventos (combina filtros con AND y mes/rango con OR)
+     * Filtrar eventos (Mes + Rango => OR)
      ********************************************/
     function filtrarEventos() {
-      const diaFiltro = document.getElementById('filtro-dia').value;
-      const mesFiltro = document.getElementById('filtro-mes').value;
-      const anoFiltro = document.getElementById('filtro-ano').value;
-      // Para el rango, usamos el valor del date range picker
+      const diaFiltro = document.getElementById('filtro-dia').value;   // 2 dígitos
+      const mesFiltro = document.getElementById('filtro-mes').value;   // 2 dígitos
+      const anoFiltro = document.getElementById('filtro-ano').value;   // 4 dígitos
+
+      // Rango con Flatpickr
       const rango = document.getElementById('filtro-rango-fecha').value;
       let fechaInicio = "";
       let fechaFin = "";
@@ -460,65 +542,65 @@
           fechaFin = partes[1];
         }
       }
+
       const busqueda = document.getElementById('filtro-busqueda').value.toLowerCase();
       const categoria = document.getElementById('filtro-categoria').value;
       const fechaPuntual = document.getElementById('filtro-fecha').value;
-    
+
       return eventos.filter(e => {
         let coincide = true;
-    
-        // Filtro por palabras clave
+
+        // Búsqueda (título o descripción)
         if (busqueda) {
           coincide = e.title.toLowerCase().includes(busqueda) ||
                      e.description.toLowerCase().includes(busqueda);
         }
-        // Filtro por año
+        // Año
         if (coincide && anoFiltro) {
-          coincide = e.date.startsWith(anoFiltro);
+          coincide = e.date.startsWith(anoFiltro); 
         }
-        // Filtro por día
+        // Día
         if (coincide && diaFiltro) {
           const diaEvento = e.date.substring(8,10);
           coincide = (diaEvento === String(diaFiltro).padStart(2,"0"));
         }
-        // Filtro por categoría
+        // Categoría
         if (coincide && categoria) {
           coincide = (e.category === categoria);
         }
-        // Filtro por fecha puntual
+        // Fecha puntual
         if (coincide && fechaPuntual) {
           coincide = (e.date === fechaPuntual);
         }
-    
-        // Filtro de mes y rango combinados con OR
+
+        // Mes + Rango => OR
         let cumpleMes = true;
         if (mesFiltro) {
           const mesEvento = e.date.substring(5,7);
           cumpleMes = (mesEvento === mesFiltro.padStart(2,"0"));
         }
         let cumpleIntervalo = cumpleRango(e.date, fechaInicio, fechaFin);
-    
+
         const tieneMes = Boolean(mesFiltro);
         const tieneRango = Boolean(fechaInicio || fechaFin);
-    
+
         if (coincide && (tieneMes || tieneRango)) {
           coincide = (cumpleMes || cumpleIntervalo);
         }
-    
         return coincide;
       });
     }
-    
+
     /********************************************
-     * Función para actualizar la leyenda (mes y año)
+     * Actualizar leyenda (mes + año)
      ********************************************/
     function actualizarLeyenda(mes, anio) {
       const infoMes = document.getElementById('info-mes');
       infoMes.textContent = `Mostrando eventos de ${MESES[mes]} ${anio}`;
     }
-    
+
     /********************************************
-     * Función para mostrar descripción detallada de eventos del mes
+     * Descripción detallada de eventos del mes
      ********************************************/
     function mostrarDescripcionMes(eventosDelMes, mes, anio) {
       const contenedor = document.getElementById('descripcion-eventos-mes');
@@ -527,7 +609,7 @@
       const titulo = document.createElement('h2');
       titulo.textContent = `Eventos de ${nombreMes} ${anio}`;
       contenedor.appendChild(titulo);
-    
+
       if (eventosDelMes.length === 0) {
         const p = document.createElement('p');
         p.textContent = 'No hay eventos para este mes.';
@@ -542,15 +624,18 @@
       });
       contenedor.appendChild(ul);
     }
-    
+
     /********************************************
-     * Función para renderizar la lista de anuncios (eventos)
+     * Renderizar lista de anuncios
      ********************************************/
     function renderizarLista(eventosFiltrados) {
       const lista = document.getElementById('lista-anuncios');
       lista.innerHTML = '';
       if (eventosFiltrados.length === 0) {
-        lista.innerHTML = '<p>No se han encontrado eventos que coincidan con los filtros seleccionados.</p><button id="btn-reset-filtros">Borrar filtros</button>';
+        lista.innerHTML = `
+          <p>No se han encontrado eventos que coincidan con los filtros seleccionados.</p>
+          <button id="btn-reset-filtros">Borrar filtros</button>
+        `;
         document.getElementById('btn-reset-filtros').addEventListener('click', () => {
           resetearFiltros();
         });
@@ -578,15 +663,14 @@
         lista.appendChild(div);
       });
     }
-    
+
     /********************************************
-     * Función para generar la vista de Mini Calendario
+     * Generar Mini Calendario
      ********************************************/
     function generarMiniCalendario(mes, anio, eventosFiltrados) {
       const contenedor = document.getElementById('mini-calendario');
       contenedor.innerHTML = '';
-      
-      // Encabezado de días de la semana (L, M, X, J, V, S, D)
+      // Días de la semana
       const diasSemana = ["L","M","X","J","V","S","D"];
       diasSemana.forEach(dia => {
         const celda = document.createElement('div');
@@ -594,34 +678,49 @@
         celda.textContent = dia;
         contenedor.appendChild(celda);
       });
-      
-      // Número de días en el mes
+      // Número de días
       const numDias = new Date(anio, mes+1, 0).getDate();
-      // Obtener el primer día del mes (0 domingo, 1 lunes, etc.)
-      const primerDia = new Date(anio, mes, 1).getDay();
-      // Convertir para que la semana inicie en lunes
+      // Primer día del mes
+      const primerDia = new Date(anio, mes, 1).getDay(); // 0=Domingo
       const offset = (primerDia === 0) ? 6 : primerDia - 1;
-      
-      // Agregar celdas vacías hasta el primer día
+
+      // Fecha de hoy
+      const hoy = new Date();
+      const hoyDia = hoy.getDate();
+      const hoyMes = hoy.getMonth();
+      const hoyAnio = hoy.getFullYear();
+
+      // Celdas vacías
       for (let i = 0; i < offset; i++) {
-        const celdaVacia = document.createElement('div');
-        celdaVacia.className = 'calendario-eventos__mini-dia';
-        contenedor.appendChild(celdaVacia);
+        const vacio = document.createElement('div');
+        vacio.className = 'calendario-eventos__mini-dia';
+        contenedor.appendChild(vacio);
       }
-      
-      // Crear celdas para cada día
+
+      // Celdas de cada día
       for (let d = 1; d <= numDias; d++) {
         const celdaDia = document.createElement('div');
         celdaDia.className = 'calendario-eventos__mini-dia';
         celdaDia.textContent = d;
-        // Formatear la fecha en formato yyyy-mm-dd para comparación
-        const fechaCelda = `${anio}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
-        // Si existe algún evento en el día, marcarlo
-        const tieneEvento = eventosFiltrados.some(ev => ev.date === fechaCelda);
-        if (tieneEvento) {
-          celdaDia.classList.add('destacado');
+
+        // Marcar día actual
+        if (anio === hoyAnio && mes === hoyMes && d === hoyDia) {
+          celdaDia.classList.add('hoy');
         }
-        // Si se ha seleccionado un rango, resaltar si el día está en él
+
+        const fechaCelda = `${anio}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        // Eventos en ese día
+        const eventosDelDia = eventosFiltrados.filter(ev => ev.date === fechaCelda);
+        if (eventosDelDia.length > 0) {
+          celdaDia.classList.add('destacado');
+          // Tooltip
+          const tooltip = document.createElement('div');
+          tooltip.className = 'calendario-eventos__tooltip';
+          tooltip.textContent = eventosDelDia.map(e => e.title).join(", ");
+          celdaDia.appendChild(tooltip);
+        }
+
+        // Resaltar si está en el rango
         const rango = document.getElementById('filtro-rango-fecha').value;
         if (rango && rango.includes(" to ")) {
           const [inicio, fin] = rango.split(" to ");
@@ -632,28 +731,42 @@
             celdaDia.classList.add('en-rango');
           }
         }
+
+        // Clic => en modo avanzado, rellena día/mes/año
+        celdaDia.addEventListener('click', () => {
+          const contenedorCalendario = document.getElementById('calendarioContenedor');
+          if (!contenedorCalendario.classList.contains('modo-sencillo')) {
+            // Rellenar
+            document.getElementById('filtro-dia').value = String(d).padStart(2,"0");
+            document.getElementById('filtro-mes').value = String(mes+1).padStart(2,"0");
+            document.getElementById('filtro-ano').value = String(anio);
+            actualizarVista();
+          }
+        });
+
         contenedor.appendChild(celdaDia);
       }
     }
-    
+
     /********************************************
-     * Función para actualizar la vista completa
+     * Actualizar la vista
      ********************************************/
     function actualizarVista() {
       const filtrados = filtrarEventos();
       renderizarLista(filtrados);
-    
-      // Determinar mes y año de referencia para la leyenda y mini calendario
+
+      // Determinar mes/año de referencia
       let mes = new Date().getMonth();
       let anio = new Date().getFullYear();
       const mesFiltro = document.getElementById('filtro-mes').value;
       const anoFiltro = document.getElementById('filtro-ano').value;
       if (mesFiltro) mes = parseInt(mesFiltro) - 1;
       if (anoFiltro) anio = parseInt(anoFiltro);
-    
+
+      // Leyenda
       actualizarLeyenda(mes, anio);
-    
-      // Extraer eventos del mes específico (de los filtrados)
+
+      // Eventos de este mes
       const eventosEsteMes = filtrados.filter(e => {
         const yearE = parseInt(e.date.substring(0,4));
         const monthE = parseInt(e.date.substring(5,7));
@@ -662,71 +775,95 @@
       mostrarDescripcionMes(eventosEsteMes, mes, anio);
       generarMiniCalendario(mes, anio, filtrados);
     }
-    
+
     /********************************************
-     * Función para reiniciar todos los filtros
+     * Resetear todos los filtros
      ********************************************/
     function resetearFiltros() {
+      document.getElementById('filtro-busqueda').value = '';
+      document.getElementById('filtro-categoria').value = '';
+      document.getElementById('filtro-rango-fecha')._flatpickr.clear();
+      document.getElementById('filtro-fecha').value = '';
       document.getElementById('filtro-dia').value = '';
       document.getElementById('filtro-mes').value = '';
       document.getElementById('filtro-ano').value = '';
-      document.getElementById('filtro-rango-fecha')._flatpickr.clear();
-      document.getElementById('filtro-busqueda').value = '';
-      document.getElementById('filtro-categoria').value = '';
-      document.getElementById('filtro-fecha').value = '';
       actualizarVista();
     }
-    
+
     /********************************************
-     * Inicializar: llenar selects y asignar eventos
+     * Alternar Modo Sencillo / Avanzado
      ********************************************/
-    function llenarDias() {
-      const selectDia = document.getElementById('filtro-dia');
-      for (let d = 1; d <= 31; d++) {
-        const opcion = document.createElement('option');
-        opcion.value = d;
-        opcion.textContent = d;
-        selectDia.appendChild(opcion);
+    function toggleModo() {
+      const contenedor = document.getElementById('calendarioContenedor');
+      const boton = document.getElementById('botonModo');
+      if (contenedor.classList.contains('modo-sencillo')) {
+        // Cambia a modo avanzado
+        contenedor.classList.remove('modo-sencillo');
+        contenedor.classList.add('modo-avanzado');
+        boton.textContent = "Cambiar a Modo Sencillo";
+      } else {
+        // Cambia a modo sencillo
+        contenedor.classList.remove('modo-avanzado');
+        contenedor.classList.add('modo-sencillo');
+        boton.textContent = "Cambiar a Modo Avanzado";
       }
     }
-    function llenarAnios() {
-      const selectAno = document.getElementById('filtro-ano');
-      for (let a = 2023; a <= 2026; a++) {
-        const opcion = document.createElement('option');
-        opcion.value = a;
-        opcion.textContent = a;
-        selectAno.appendChild(opcion);
+
+    /********************************************
+     * Atajos de teclado
+     ********************************************/
+    function manejarAtajos(e) {
+      // Alt + R => resetear filtros
+      if (e.altKey && e.key.toLowerCase() === 'r') {
+        resetearFiltros();
       }
     }
-    
+
+    /********************************************
+     * Inicializar
+     ********************************************/
     function asignarEventos() {
-      const controles = document.querySelectorAll('#filtro-dia, #filtro-mes, #filtro-ano, #filtro-busqueda, #filtro-categoria, #filtro-fecha');
+      // Escucha en inputs
+      const controles = document.querySelectorAll('#filtro-busqueda, #filtro-categoria, #filtro-fecha, #filtro-dia, #filtro-mes, #filtro-ano');
       controles.forEach(ctrl => {
         ctrl.addEventListener('change', actualizarVista);
         ctrl.addEventListener('input', actualizarVista);
       });
-      // Para el date range, Flatpickr ya llama a actualizarVista en onChange
-      // Botón para limpiar el rango
+      // Borrar rango
       document.getElementById('borrar-rango-fecha').addEventListener('click', () => {
         document.getElementById('filtro-rango-fecha')._flatpickr.clear();
         actualizarVista();
       });
-      // Botón para limpiar la fecha puntual
+      // Borrar fecha puntual
       document.getElementById('borrar-fecha').addEventListener('click', () => {
         document.getElementById('filtro-fecha').value = '';
         actualizarVista();
       });
-      // Botón "Ver Todo"
-      document.getElementById('resetear-filtros').addEventListener('click', resetearFiltros);
+      // Botones de borrar en día, mes, año
+      document.getElementById('borrar-dia').addEventListener('click', () => {
+        document.getElementById('filtro-dia').value = '';
+        actualizarVista();
+      });
+      document.getElementById('borrar-mes').addEventListener('click', () => {
+        document.getElementById('filtro-mes').value = '';
+        actualizarVista();
+      });
+      document.getElementById('borrar-ano').addEventListener('click', () => {
+        document.getElementById('filtro-ano').value = '';
+        actualizarVista();
+      });
+      // Botón Quitar Filtros (Arriba a la derecha)
+      document.getElementById('botonQuitarFiltros').addEventListener('click', resetearFiltros);
+      // Modo Sencillo / Avanzado
+      document.getElementById('botonModo').addEventListener('click', toggleModo);
+      // Atajos de teclado (Alt+R)
+      document.addEventListener('keydown', manejarAtajos);
     }
-    
+
     function iniciar() {
-      llenarDias();
-      llenarAnios();
       asignarEventos();
       actualizarVista();
     }
-    
     document.addEventListener('DOMContentLoaded', iniciar);
   </script>
 </body>
