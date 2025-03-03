@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calendario de Eventos - Falla Suïssa</title>
+  
+  <!-- Flatpickr CSS para el date range picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
   <style>
     /* ==========================
        BLOQUE: calendario-eventos
@@ -15,7 +19,7 @@
       background-color: #fdf2e9; /* naranja-suave */
       border: 1px solid #fdfdfd; /* blanco-sutil-gris */
       border-radius: 8px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       font-family: Arial, sans-serif;
     }
     .calendario-eventos__cabecera {
@@ -27,7 +31,7 @@
       color: #ff6f61; /* primary-color */
       margin: 0;
     }
-
+    
     /* ===== CONTROLES DE FILTRO ===== */
     .calendario-eventos__controles {
       display: flex;
@@ -63,14 +67,33 @@
       background-color: black;
       color: white;
     }
-
-    /* Contenedor para input de fecha + botón de limpiar */
+    /* Botón para reiniciar todos los filtros */
+    .calendario-eventos__control-reiniciar {
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #333;
+      border-radius: 5px;
+      background-color: #fff;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .calendario-eventos__control-reiniciar:hover {
+      background-color: black;
+      color: white;
+    }
+    
+    /* Contenedor para el date range picker */
     .calendario-eventos__control-fecha-wrapper {
       position: relative;
       display: inline-block;
+      width: 100%;
     }
     .calendario-eventos__control-fecha {
-      padding-right: 3rem; /* Espacio para la 'X' */
+      width: 100%;
+      padding-right: 3rem; /* Espacio para el botón de limpiar */
+      /* Aunque los inputs de tipo date no muestran placeholder en algunos navegadores, se incluye */
+      placeholder: "YYYY-MM-DD a YYYY-MM-DD";
     }
     .calendario-eventos__control-fecha::-webkit-calendar-picker-indicator {
       position: absolute;
@@ -96,8 +119,8 @@
     .calendario-eventos__control-fecha-wrapper:hover .calendario-eventos__control-fecha-borrar {
       color: white;
     }
-
-    /* ===== LEYENDA (mes y año actuales) Y DETALLE DE EVENTOS ===== */
+    
+    /* ===== LEYENDA Y DESCRIPCIÓN ===== */
     .calendario-eventos__leyenda {
       margin: 1rem 0;
       font-size: 1.2rem;
@@ -125,8 +148,37 @@
     .calendario-eventos__detalles-mes li {
       margin-bottom: 0.5rem;
     }
-
-    /* ===== LISTA DE ANUNCIOS ===== */
+    
+    /* ===== MINI CALENDARIO (vista en cuadrícula) ===== */
+    .calendario-eventos__mini {
+      margin: 1rem 0;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.5rem;
+      text-align: center;
+    }
+    .calendario-eventos__mini-encabezado {
+      font-weight: bold;
+      color: #333;
+    }
+    .calendario-eventos__mini-dia {
+      padding: 0.5rem;
+      border-radius: 4px;
+      background-color: #fff;
+      border: 1px solid #fdfdfd;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+    .calendario-eventos__mini-dia.destacado {
+      background-color: #ff6f61;
+      color: #fff;
+    }
+    .calendario-eventos__mini-dia.en-rango {
+      background: linear-gradient(45deg, #ff6f61, #ff9a7d);
+      color: #fff;
+    }
+    
+    /* ===== LISTA DE ANUNCIOS (eventos) ===== */
     .calendario-eventos__lista {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -159,7 +211,7 @@
       display: flex;
       justify-content: space-between;
     }
-
+    
     /* ===== MODIFICADORES DE CATEGORÍA ===== */
     .calendario-eventos__item--urgente {
       border-left: 6px solid red;
@@ -170,7 +222,7 @@
     .calendario-eventos__item--recordatorio {
       border-left: 6px solid orange;
     }
-
+    
     /* ===== RESPONSIVIDAD ===== */
     @media (max-width: 480px) {
       .calendario-eventos {
@@ -195,6 +247,10 @@
       .calendario-eventos__item-meta {
         font-size: 0.8rem;
       }
+      .calendario-eventos__mini {
+        grid-template-columns: repeat(7, 1fr);
+        font-size: 0.8rem;
+      }
     }
     @media (min-width: 481px) and (max-width: 768px) {
       .calendario-eventos {
@@ -204,7 +260,7 @@
       .calendario-eventos__cabecera-titulo {
         font-size: 2rem;
       }
-      .calendario-eventos__controles-select,
+      .calendario-eventos__control-select,
       .calendario-eventos__control-fecha,
       .calendario-eventos__control-busqueda {
         width: 100%;
@@ -239,6 +295,9 @@
       }
     }
   </style>
+  
+  <!-- Flatpickr JS -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 <body>
   <div class="calendario-eventos">
@@ -276,21 +335,14 @@
         <label for="filtro-ano">Año</label>
         <select id="filtro-ano" class="calendario-eventos__control-select">
           <option value="">Todos</option>
-          <!-- Se llenará en JS -->
         </select>
       </div>
+      <!-- Nuevo control: Date Range Picker en lugar de "Desde" y "Hasta" separados -->
       <div class="calendario-eventos__control">
-        <label for="filtro-fecha-inicio">Desde</label>
+        <label for="filtro-rango-fecha">Rango de fechas</label>
         <div class="calendario-eventos__control-fecha-wrapper">
-          <input type="date" id="filtro-fecha-inicio" class="calendario-eventos__control-fecha">
-          <button id="borrar-fecha-inicio" class="calendario-eventos__control-fecha-borrar">✕</button>
-        </div>
-      </div>
-      <div class="calendario-eventos__control">
-        <label for="filtro-fecha-fin">Hasta</label>
-        <div class="calendario-eventos__control-fecha-wrapper">
-          <input type="date" id="filtro-fecha-fin" class="calendario-eventos__control-fecha">
-          <button id="borrar-fecha-fin" class="calendario-eventos__control-fecha-borrar">✕</button>
+          <input type="text" id="filtro-rango-fecha" class="calendario-eventos__control-fecha" placeholder="YYYY-MM-DD a YYYY-MM-DD" required>
+          <button id="borrar-rango-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
         </div>
       </div>
       <div class="calendario-eventos__control">
@@ -309,15 +361,22 @@
       <div class="calendario-eventos__control">
         <label for="filtro-fecha">Fecha puntual</label>
         <div class="calendario-eventos__control-fecha-wrapper">
-          <input type="date" id="filtro-fecha" class="calendario-eventos__control-fecha">
+          <input type="date" id="filtro-fecha" class="calendario-eventos__control-fecha" placeholder="YYYY-MM-DD">
           <button id="borrar-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
         </div>
+      </div>
+      <!-- Botón para reiniciar todos los filtros -->
+      <div class="calendario-eventos__control">
+        <button id="resetear-filtros" class="calendario-eventos__control-reiniciar">Ver Todo</button>
       </div>
     </div>
 
     <!-- Leyenda con el mes y año actuales -->
-    <div class="calendario-eventos__leyenda" id="info-mes">
-      <!-- "Mostrando eventos de [Mes Nombre] [Año]" -->
+    <div class="calendario-eventos__leyenda" id="info-mes"></div>
+
+    <!-- Vista de Mini Calendario (cuadrícula de días) -->
+    <div class="calendario-eventos__mini" id="mini-calendario">
+      <!-- Se generará dinámicamente -->
     </div>
 
     <!-- Descripción detallada de los eventos del mes -->
@@ -325,7 +384,7 @@
       <!-- Listado de eventos del mes en forma de bullet list -->
     </div>
 
-    <!-- Lista de anuncios (los eventos filtrados) -->
+    <!-- Lista de anuncios (eventos filtrados) -->
     <div class="calendario-eventos__lista" id="lista-anuncios">
       <!-- Se inyectan dinámicamente -->
     </div>
@@ -333,7 +392,7 @@
 
   <script>
     /********************************************
-     * Datos de ejemplo
+     * Datos de ejemplo (simula eventos)
      ********************************************/
     const eventos = [
       { id: 1, title: "Reunión de Fallas", description: "Organización general", date: "2025-03-15", category: "Urgente" },
@@ -342,107 +401,124 @@
       { id: 4, title: "Concierto", description: "Concierto de música tradicional", date: "2025-03-15", category: "Información" },
       { id: 5, title: "Paella Popular", description: "Evento gastronómico en la plaza", date: "2025-05-08", category: "Información" }
     ];
-
+    
     const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-
+    
     /********************************************
-     * Convertir "yyyy-mm-dd" a Date object
+     * Inicialización de Flatpickr para el rango
+     ********************************************/
+    flatpickr("#filtro-rango-fecha", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      onChange: function(selectedDates, dateStr, instance) {
+        actualizarVista();
+      }
+    });
+    
+    // Evento "invalid" para mostrar mensaje si la fecha es inválida
+    document.getElementById("filtro-rango-fecha").addEventListener("invalid", function(e) {
+      alert("Formato inválido, use YYYY-MM-DD a YYYY-MM-DD");
+    });
+    
+    /********************************************
+     * Función toDateObj: Convierte 'yyyy-mm-dd' a objeto Date
      ********************************************/
     function toDateObj(str) {
-      // Si no hay valor o no cumple el patrón, retornamos null
       if (!str || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return null;
-      const [yyyy, mm, dd] = str.split("-").map(x => parseInt(x,10));
-      return new Date(yyyy, mm-1, dd);
+      const [yyyy, mm, dd] = str.split("-").map(Number);
+      return new Date(yyyy, mm - 1, dd);
     }
-
+    
     /********************************************
-     * Función para comprobar si un e.date (string)
-     * está dentro del rango [fechaInicio, fechaFin]
+     * Función para comprobar si e.date está en un rango
      ********************************************/
-    function cumpleRango(eDateStr, fechaInicioStr, fechaFinStr) {
+    function cumpleRango(eDateStr, fechaInicio, fechaFin) {
       const eDate = toDateObj(eDateStr);
-      if (!eDate) return false; // El evento tiene una fecha inválida
-
-      const iniDate = toDateObj(fechaInicioStr);
-      const finDate = toDateObj(fechaFinStr);
-
-      // Si no hay rango definido, se considera que cumple
-      if (!iniDate && !finDate) return true;
-      // Comparaciones con getTime()
-      if (iniDate && eDate.getTime() < iniDate.getTime()) return false;
-      if (finDate && eDate.getTime() > finDate.getTime()) return false;
+      if (!eDate) return false;
+      const iniDate = fechaInicio ? toDateObj(fechaInicio) : null;
+      const finDate = fechaFin ? toDateObj(fechaFin) : null;
+      if (iniDate && eDate < iniDate) return false;
+      if (finDate && eDate > finDate) return false;
       return true;
     }
-
+    
     /********************************************
-     * Filtrar eventos con la lógica "mes OR rango"
+     * Filtrar eventos (combina filtros con AND y mes/rango con OR)
      ********************************************/
     function filtrarEventos() {
       const diaFiltro = document.getElementById('filtro-dia').value;
       const mesFiltro = document.getElementById('filtro-mes').value;
       const anoFiltro = document.getElementById('filtro-ano').value;
-      const fechaInicio = document.getElementById('filtro-fecha-inicio').value; 
-      const fechaFin = document.getElementById('filtro-fecha-fin').value;
+      // Para el rango, usamos el valor del date range picker
+      const rango = document.getElementById('filtro-rango-fecha').value;
+      let fechaInicio = "";
+      let fechaFin = "";
+      if (rango && rango.includes(" to ")) {
+        const partes = rango.split(" to ");
+        if (partes.length === 2) {
+          fechaInicio = partes[0];
+          fechaFin = partes[1];
+        }
+      }
       const busqueda = document.getElementById('filtro-busqueda').value.toLowerCase();
       const categoria = document.getElementById('filtro-categoria').value;
       const fechaPuntual = document.getElementById('filtro-fecha').value;
-
+    
       return eventos.filter(e => {
         let coincide = true;
-
-        // 1) Búsqueda
+    
+        // Filtro por palabras clave
         if (busqueda) {
           coincide = e.title.toLowerCase().includes(busqueda) ||
                      e.description.toLowerCase().includes(busqueda);
         }
-        // 2) Año
+        // Filtro por año
         if (coincide && anoFiltro) {
           coincide = e.date.startsWith(anoFiltro);
         }
-        // 3) Día
+        // Filtro por día
         if (coincide && diaFiltro) {
           const diaEvento = e.date.substring(8,10);
           coincide = (diaEvento === String(diaFiltro).padStart(2,"0"));
         }
-        // 4) Categoría
+        // Filtro por categoría
         if (coincide && categoria) {
           coincide = (e.category === categoria);
         }
-        // 5) Fecha puntual
+        // Filtro por fecha puntual
         if (coincide && fechaPuntual) {
-          // e.date debe ser == fechaPuntual
           coincide = (e.date === fechaPuntual);
         }
-
-        // 6) Mes y/o Rango => OR
+    
+        // Filtro de mes y rango combinados con OR
         let cumpleMes = true;
         if (mesFiltro) {
           const mesEvento = e.date.substring(5,7);
           cumpleMes = (mesEvento === mesFiltro.padStart(2,"0"));
         }
         let cumpleIntervalo = cumpleRango(e.date, fechaInicio, fechaFin);
-
-        // Si el usuario definió mes o rango, se aplica OR
+    
         const tieneMes = Boolean(mesFiltro);
         const tieneRango = Boolean(fechaInicio || fechaFin);
-
+    
         if (coincide && (tieneMes || tieneRango)) {
           coincide = (cumpleMes || cumpleIntervalo);
         }
+    
         return coincide;
       });
     }
-
+    
     /********************************************
-     * Leyenda (mes + año)
+     * Función para actualizar la leyenda (mes y año)
      ********************************************/
     function actualizarLeyenda(mes, anio) {
       const infoMes = document.getElementById('info-mes');
       infoMes.textContent = `Mostrando eventos de ${MESES[mes]} ${anio}`;
     }
-
+    
     /********************************************
-     * Descripción detallada de eventos del mes
+     * Función para mostrar descripción detallada de eventos del mes
      ********************************************/
     function mostrarDescripcionMes(eventosDelMes, mes, anio) {
       const contenedor = document.getElementById('descripcion-eventos-mes');
@@ -451,7 +527,7 @@
       const titulo = document.createElement('h2');
       titulo.textContent = `Eventos de ${nombreMes} ${anio}`;
       contenedor.appendChild(titulo);
-
+    
       if (eventosDelMes.length === 0) {
         const p = document.createElement('p');
         p.textContent = 'No hay eventos para este mes.';
@@ -466,15 +542,18 @@
       });
       contenedor.appendChild(ul);
     }
-
+    
     /********************************************
-     * Renderizar Lista de Anuncios
+     * Función para renderizar la lista de anuncios (eventos)
      ********************************************/
     function renderizarLista(eventosFiltrados) {
       const lista = document.getElementById('lista-anuncios');
       lista.innerHTML = '';
       if (eventosFiltrados.length === 0) {
-        lista.innerHTML = '<p>No se encontraron anuncios.</p>';
+        lista.innerHTML = '<p>No se han encontrado eventos que coincidan con los filtros seleccionados.</p><button id="btn-reset-filtros">Borrar filtros</button>';
+        document.getElementById('btn-reset-filtros').addEventListener('click', () => {
+          resetearFiltros();
+        });
         return;
       }
       eventosFiltrados.forEach(e => {
@@ -499,36 +578,107 @@
         lista.appendChild(div);
       });
     }
-
+    
     /********************************************
-     * Actualizar Vista
+     * Función para generar la vista de Mini Calendario
+     ********************************************/
+    function generarMiniCalendario(mes, anio, eventosFiltrados) {
+      const contenedor = document.getElementById('mini-calendario');
+      contenedor.innerHTML = '';
+      
+      // Encabezado de días de la semana (L, M, X, J, V, S, D)
+      const diasSemana = ["L","M","X","J","V","S","D"];
+      diasSemana.forEach(dia => {
+        const celda = document.createElement('div');
+        celda.className = 'calendario-eventos__mini-encabezado';
+        celda.textContent = dia;
+        contenedor.appendChild(celda);
+      });
+      
+      // Número de días en el mes
+      const numDias = new Date(anio, mes+1, 0).getDate();
+      // Obtener el primer día del mes (0 domingo, 1 lunes, etc.)
+      const primerDia = new Date(anio, mes, 1).getDay();
+      // Convertir para que la semana inicie en lunes
+      const offset = (primerDia === 0) ? 6 : primerDia - 1;
+      
+      // Agregar celdas vacías hasta el primer día
+      for (let i = 0; i < offset; i++) {
+        const celdaVacia = document.createElement('div');
+        celdaVacia.className = 'calendario-eventos__mini-dia';
+        contenedor.appendChild(celdaVacia);
+      }
+      
+      // Crear celdas para cada día
+      for (let d = 1; d <= numDias; d++) {
+        const celdaDia = document.createElement('div');
+        celdaDia.className = 'calendario-eventos__mini-dia';
+        celdaDia.textContent = d;
+        // Formatear la fecha en formato yyyy-mm-dd para comparación
+        const fechaCelda = `${anio}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        // Si existe algún evento en el día, marcarlo
+        const tieneEvento = eventosFiltrados.some(ev => ev.date === fechaCelda);
+        if (tieneEvento) {
+          celdaDia.classList.add('destacado');
+        }
+        // Si se ha seleccionado un rango, resaltar si el día está en él
+        const rango = document.getElementById('filtro-rango-fecha').value;
+        if (rango && rango.includes(" to ")) {
+          const [inicio, fin] = rango.split(" to ");
+          const dObj = toDateObj(fechaCelda);
+          const iniObj = toDateObj(inicio);
+          const finObj = toDateObj(fin);
+          if (iniObj && finObj && dObj >= iniObj && dObj <= finObj) {
+            celdaDia.classList.add('en-rango');
+          }
+        }
+        contenedor.appendChild(celdaDia);
+      }
+    }
+    
+    /********************************************
+     * Función para actualizar la vista completa
      ********************************************/
     function actualizarVista() {
       const filtrados = filtrarEventos();
       renderizarLista(filtrados);
-
-      // Determinar mes/año de referencia para la leyenda
+    
+      // Determinar mes y año de referencia para la leyenda y mini calendario
       let mes = new Date().getMonth();
       let anio = new Date().getFullYear();
       const mesFiltro = document.getElementById('filtro-mes').value;
       const anoFiltro = document.getElementById('filtro-ano').value;
       if (mesFiltro) mes = parseInt(mesFiltro) - 1;
       if (anoFiltro) anio = parseInt(anoFiltro);
-
-      // Actualizar leyenda
+    
       actualizarLeyenda(mes, anio);
-
-      // Listar eventos de ese mes en el array filtrado
+    
+      // Extraer eventos del mes específico (de los filtrados)
       const eventosEsteMes = filtrados.filter(e => {
         const yearE = parseInt(e.date.substring(0,4));
         const monthE = parseInt(e.date.substring(5,7));
-        return (yearE === anio && (monthE === (mes+1)));
+        return (yearE === anio && monthE === (mes+1));
       });
       mostrarDescripcionMes(eventosEsteMes, mes, anio);
+      generarMiniCalendario(mes, anio, filtrados);
     }
-
+    
     /********************************************
-     * Inicializar
+     * Función para reiniciar todos los filtros
+     ********************************************/
+    function resetearFiltros() {
+      document.getElementById('filtro-dia').value = '';
+      document.getElementById('filtro-mes').value = '';
+      document.getElementById('filtro-ano').value = '';
+      document.getElementById('filtro-rango-fecha')._flatpickr.clear();
+      document.getElementById('filtro-busqueda').value = '';
+      document.getElementById('filtro-categoria').value = '';
+      document.getElementById('filtro-fecha').value = '';
+      actualizarVista();
+    }
+    
+    /********************************************
+     * Inicializar: llenar selects y asignar eventos
      ********************************************/
     function llenarDias() {
       const selectDia = document.getElementById('filtro-dia');
@@ -548,35 +698,35 @@
         selectAno.appendChild(opcion);
       }
     }
-
+    
     function asignarEventos() {
-      const controles = document.querySelectorAll('#filtro-dia, #filtro-mes, #filtro-ano, #filtro-fecha-inicio, #filtro-fecha-fin, #filtro-busqueda, #filtro-categoria, #filtro-fecha');
+      const controles = document.querySelectorAll('#filtro-dia, #filtro-mes, #filtro-ano, #filtro-busqueda, #filtro-categoria, #filtro-fecha');
       controles.forEach(ctrl => {
         ctrl.addEventListener('change', actualizarVista);
         ctrl.addEventListener('input', actualizarVista);
       });
-      // Botones para limpiar
-      document.getElementById('borrar-fecha-inicio').addEventListener('click', () => {
-        document.getElementById('filtro-fecha-inicio').value = '';
+      // Para el date range, Flatpickr ya llama a actualizarVista en onChange
+      // Botón para limpiar el rango
+      document.getElementById('borrar-rango-fecha').addEventListener('click', () => {
+        document.getElementById('filtro-rango-fecha')._flatpickr.clear();
         actualizarVista();
       });
-      document.getElementById('borrar-fecha-fin').addEventListener('click', () => {
-        document.getElementById('filtro-fecha-fin').value = '';
-        actualizarVista();
-      });
+      // Botón para limpiar la fecha puntual
       document.getElementById('borrar-fecha').addEventListener('click', () => {
         document.getElementById('filtro-fecha').value = '';
         actualizarVista();
       });
+      // Botón "Ver Todo"
+      document.getElementById('resetear-filtros').addEventListener('click', resetearFiltros);
     }
-
+    
     function iniciar() {
       llenarDias();
       llenarAnios();
       asignarEventos();
       actualizarVista();
     }
-
+    
     document.addEventListener('DOMContentLoaded', iniciar);
   </script>
 </body>
