@@ -241,6 +241,14 @@
       cursor: pointer;
       position: relative;
     }
+    /* Resaltar fines de semana: se asignarán mediante clases en JS */
+    .calendario-eventos__mini-dia.fin-sabado {
+      background-color: #e0e0e0;
+    }
+    .calendario-eventos__mini-dia.fin-domingo {
+      background-color: #ffcccc;
+      color: red; /* Números en rojo para domingos */
+    }
     .calendario-eventos__tooltip {
       visibility: hidden;
       opacity: 0;
@@ -486,7 +494,7 @@
     const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
     /********************************************
-     * Flatpickr para el rango (ahora en español y semana iniciando en lunes)
+     * Flatpickr para el rango (en español, semana iniciando en lunes)
      ********************************************/
     flatpickr("#filtro-rango-fecha", {
       mode: "range",
@@ -494,26 +502,12 @@
       locale: {
         firstDayOfWeek: 1,
         weekdays: {
-          shorthand: ["Dom","Lun","Mar","Mié","Jue","Vie","Sáb"],
-          longhand: [
-            "Domingo",
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes",
-            "Sábado"
-          ]
+          shorthand: ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"],
+          longhand: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
         },
         months: {
-          shorthand: [
-            "Ene","Feb","Mar","Abr","May","Jun",
-            "Jul","Ago","Sep","Oct","Nov","Dic"
-          ],
-          longhand: [
-            "Enero","Febrero","Marzo","Abril","Mayo","Junio",
-            "Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"
-          ]
+          shorthand: ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
+          longhand: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
         }
       },
       onChange: function(selectedDates, dateStr, instance) {
@@ -522,7 +516,8 @@
     });
 
     /********************************************
-     * toDateObj: Convierte 'yyyy-mm-dd' a objeto Date
+     * Función: toDateObj
+     * Convierte 'YYYY-MM-DD' a objeto Date
      ********************************************/
     function toDateObj(str) {
       if (!str || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return null;
@@ -531,7 +526,8 @@
     }
 
     /********************************************
-     * cumpleRango: Verifica si e.date está en [ini, fin]
+     * Función: cumpleRango
+     * Verifica si e.date está en el rango [inicio, fin]
      ********************************************/
     function cumpleRango(eDateStr, fechaInicio, fechaFin) {
       const eDate = toDateObj(eDateStr);
@@ -544,14 +540,15 @@
     }
 
     /********************************************
-     * Filtrar eventos (Mes + Rango => OR)
+     * Función: filtrarEventos
+     * Filtra los eventos según controles: búsqueda, categoría, fecha puntual,
+     * día, mes, año y rango de fechas
      ********************************************/
     function filtrarEventos() {
-      const diaFiltro = document.getElementById('filtro-dia').value;   // 2 dígitos
-      const mesFiltro = document.getElementById('filtro-mes').value;   // 2 dígitos
-      const anoFiltro = document.getElementById('filtro-ano').value;   // 4 dígitos
+      const diaFiltro = document.getElementById('filtro-dia').value;
+      const mesFiltro = document.getElementById('filtro-mes').value;
+      const anoFiltro = document.getElementById('filtro-ano').value;
 
-      // Rango con Flatpickr
       const rango = document.getElementById('filtro-rango-fecha').value;
       let fechaInicio = "";
       let fechaFin = "";
@@ -569,41 +566,32 @@
 
       return eventos.filter(e => {
         let coincide = true;
-
-        // Búsqueda (título o descripción)
         if (busqueda) {
           coincide = e.title.toLowerCase().includes(busqueda) ||
                      e.description.toLowerCase().includes(busqueda);
         }
-        // Año
         if (coincide && anoFiltro) {
-          coincide = e.date.startsWith(anoFiltro); 
+          coincide = e.date.startsWith(anoFiltro);
         }
-        // Día
         if (coincide && diaFiltro) {
           const diaEvento = e.date.substring(8,10);
           coincide = (diaEvento === String(diaFiltro).padStart(2,"0"));
         }
-        // Categoría
         if (coincide && categoria) {
           coincide = (e.category === categoria);
         }
-        // Fecha puntual
         if (coincide && fechaPuntual) {
           coincide = (e.date === fechaPuntual);
         }
 
-        // Mes + Rango => OR
         let cumpleMes = true;
         if (mesFiltro) {
           const mesEvento = e.date.substring(5,7);
           cumpleMes = (mesEvento === mesFiltro.padStart(2,"0"));
         }
         let cumpleIntervalo = cumpleRango(e.date, fechaInicio, fechaFin);
-
         const tieneMes = Boolean(mesFiltro);
         const tieneRango = Boolean(fechaInicio || fechaFin);
-
         if (coincide && (tieneMes || tieneRango)) {
           coincide = (cumpleMes || cumpleIntervalo);
         }
@@ -612,7 +600,8 @@
     }
 
     /********************************************
-     * Actualizar leyenda (mes + año)
+     * Función: actualizarLeyenda
+     * Actualiza la leyenda con el mes y año de referencia
      ********************************************/
     function actualizarLeyenda(mes, anio) {
       const infoMes = document.getElementById('info-mes');
@@ -620,7 +609,8 @@
     }
 
     /********************************************
-     * Descripción detallada de eventos del mes
+     * Función: mostrarDescripcionMes
+     * Muestra la descripción detallada de los eventos del mes seleccionado
      ********************************************/
     function mostrarDescripcionMes(eventosDelMes, mes, anio) {
       const contenedor = document.getElementById('descripcion-eventos-mes');
@@ -629,7 +619,6 @@
       const titulo = document.createElement('h2');
       titulo.textContent = `Eventos de ${nombreMes} ${anio}`;
       contenedor.appendChild(titulo);
-
       if (eventosDelMes.length === 0) {
         const p = document.createElement('p');
         p.textContent = 'No hay eventos para este mes.';
@@ -646,7 +635,8 @@
     }
 
     /********************************************
-     * Renderizar lista de anuncios
+     * Función: renderizarLista
+     * Renderiza la lista de eventos filtrados (vista de lista/agenda)
      ********************************************/
     function renderizarLista(eventosFiltrados) {
       const lista = document.getElementById('lista-anuncios');
@@ -685,13 +675,13 @@
     }
 
     /********************************************
-     * Generar Mini Calendario
+     * Función: generarMiniCalendario
+     * Genera el mini calendario (cuadrícula de días) con encabezados de la semana (lunes a domingo)
      ********************************************/
     function generarMiniCalendario(mes, anio, eventosFiltrados) {
       const contenedor = document.getElementById('mini-calendario');
       contenedor.innerHTML = '';
-      // Días de la semana (en orden: domingo a sábado, para que firstDayOfWeek=1
-      // de Flatpickr ordene correctamente la semana comenzando en lunes)
+      // Encabezados de la semana (lunes a domingo)
       const diasSemana = ["L","M","X","J","V","S","D"];
       diasSemana.forEach(dia => {
         const celda = document.createElement('div');
@@ -700,38 +690,49 @@
         contenedor.appendChild(celda);
       });
 
-      // Número de días
-      const numDias = new Date(anio, mes+1, 0).getDate();
-      // Primer día del mes (0=Domingo, 1=Lunes, etc.)
+      // Número de días en el mes
+      const numDias = new Date(anio, mes + 1, 0).getDate();
+      // Primer día del mes (0 = domingo, 1 = lunes, etc.)
       const primerDia = new Date(anio, mes, 1).getDay();
-      // Calcula offset para que lunes sea la primera columna (si es 0 => es domingo => offset=6, etc.)
+      // Calcular offset para que la semana empiece en lunes
       const offset = (primerDia === 0) ? 6 : primerDia - 1;
 
-      // Fecha de hoy
+      // Fecha actual
       const hoy = new Date();
       const hoyDia = hoy.getDate();
       const hoyMes = hoy.getMonth();
       const hoyAnio = hoy.getFullYear();
 
-      // Celdas vacías
+      // Celdas vacías por el offset
       for (let i = 0; i < offset; i++) {
         const vacio = document.createElement('div');
         vacio.className = 'calendario-eventos__mini-dia';
         contenedor.appendChild(vacio);
       }
 
-      // Celdas de cada día
+      // Generar celdas para cada día
       for (let d = 1; d <= numDias; d++) {
         const celdaDia = document.createElement('div');
         celdaDia.className = 'calendario-eventos__mini-dia';
         celdaDia.textContent = d;
 
-        // Marcar día actual
+        // Calcular el índice del día en la semana (0 = lunes, 6 = domingo)
+        const indiceDia = (offset + d - 1) % 7;
+        // Si es sábado (índice 5), añadir clase específica
+        if (indiceDia === 5) {
+          celdaDia.classList.add('fin-sabado');
+        }
+        // Si es domingo (índice 6), añadir clase específica
+        if (indiceDia === 6) {
+          celdaDia.classList.add('fin-domingo');
+        }
+
+        // Marcar el día actual
         if (anio === hoyAnio && mes === hoyMes && d === hoyDia) {
           celdaDia.classList.add('hoy');
         }
 
-        const fechaCelda = `${anio}-${String(mes+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+        const fechaCelda = `${anio}-${String(mes + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
         // Eventos en ese día
         const eventosDelDia = eventosFiltrados.filter(ev => ev.date === fechaCelda);
         if (eventosDelDia.length > 0) {
@@ -743,7 +744,7 @@
           celdaDia.appendChild(tooltip);
         }
 
-        // Resaltar si está en el rango seleccionado
+        // Si la fecha cae dentro del rango seleccionado, agregar clase 'en-rango'
         const rango = document.getElementById('filtro-rango-fecha').value;
         if (rango && rango.includes(" to ")) {
           const [inicio, fin] = rango.split(" to ");
@@ -755,12 +756,12 @@
           }
         }
 
-        // Clic en la celda: en modo avanzado, rellena los campos de día, mes y año
+        // Al hacer clic en la celda, en modo avanzado, se rellenan los campos de día, mes y año
         celdaDia.addEventListener('click', () => {
           const contenedorCalendario = document.getElementById('calendarioContenedor');
           if (!contenedorCalendario.classList.contains('modo-sencillo')) {
             document.getElementById('filtro-dia').value = String(d).padStart(2,"0");
-            document.getElementById('filtro-mes').value = String(mes+1).padStart(2,"0");
+            document.getElementById('filtro-mes').value = String(mes + 1).padStart(2,"0");
             document.getElementById('filtro-ano').value = String(anio);
             actualizarVista();
           }
@@ -771,24 +772,20 @@
     }
 
     /********************************************
-     * Actualizar la vista (filtros, mini calendario, lista y descripción)
+     * Función: actualizarVista
+     * Actualiza filtros, mini calendario, lista y descripción de eventos
      ********************************************/
     function actualizarVista() {
       const filtrados = filtrarEventos();
       renderizarLista(filtrados);
-
-      // Determinar mes y año de referencia: se toma del filtro, o de la fecha actual si no se ha ingresado
+      // Determinar mes y año de referencia: del filtro o de la fecha actual
       let mes = new Date().getMonth();
       let anio = new Date().getFullYear();
       const mesFiltro = document.getElementById('filtro-mes').value;
       const anoFiltro = document.getElementById('filtro-ano').value;
       if (mesFiltro) mes = parseInt(mesFiltro) - 1;
       if (anoFiltro) anio = parseInt(anoFiltro);
-
-      // Actualizar leyenda
       actualizarLeyenda(mes, anio);
-
-      // Filtrar eventos del mes seleccionado
       const eventosEsteMes = filtrados.filter(e => {
         const yearE = parseInt(e.date.substring(0,4));
         const monthE = parseInt(e.date.substring(5,7));
@@ -799,7 +796,8 @@
     }
 
     /********************************************
-     * Resetear todos los filtros
+     * Función: resetearFiltros
+     * Limpia todos los controles y actualiza la vista
      ********************************************/
     function resetearFiltros() {
       document.getElementById('filtro-busqueda').value = '';
@@ -813,7 +811,8 @@
     }
 
     /********************************************
-     * Alternar Modo Sencillo / Avanzado
+     * Función: toggleModo
+     * Alterna entre modo sencillo y avanzado
      ********************************************/
     function toggleModo() {
       const contenedor = document.getElementById('calendarioContenedor');
@@ -830,7 +829,8 @@
     }
 
     /********************************************
-     * Atajos de teclado (Alt + R para resetear filtros)
+     * Función: manejarAtajos
+     * Atajo: Alt+R para resetear filtros
      ********************************************/
     function manejarAtajos(e) {
       if (e.altKey && e.key.toLowerCase() === 'r') {
@@ -839,7 +839,8 @@
     }
 
     /********************************************
-     * Inicializar eventos
+     * Función: asignarEventos
+     * Asigna eventos a controles y botones
      ********************************************/
     function asignarEventos() {
       const controles = document.querySelectorAll('#filtro-busqueda, #filtro-categoria, #filtro-fecha, #filtro-dia, #filtro-mes, #filtro-ano');
@@ -872,6 +873,10 @@
       document.addEventListener('keydown', manejarAtajos);
     }
 
+    /********************************************
+     * Función: iniciar
+     * Inicializa el sistema asignando eventos y actualizando la vista
+     ********************************************/
     function iniciar() {
       asignarEventos();
       actualizarVista();
