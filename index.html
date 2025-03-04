@@ -121,12 +121,43 @@
         font-size: 0.95rem;
       }
     }
-    .calendario-eventos__control-texto:hover,
-    .calendario-eventos__control-fecha:hover,
-    .calendario-eventos__control-busqueda:hover {
-      background-color: #444;
+
+
+        /* Contenedor de cada campo: al hacer hover, fondo oscuro y texto blanco */
+    .calendario-eventos__control:hover {
+      
+      color: #fff;           /* Texto en blanco */
+    }
+
+    /* EXCEPCIÓN: las etiquetas se mantienen en su color original */
+    .calendario-eventos__control:hover label {
+      color: #333; /* Ajusta al color que quieras para las etiquetas */
+    }
+
+    /* Inputs hijos */
+    .calendario-eventos__control:hover .calendario-eventos__control-texto,
+    .calendario-eventos__control:hover .calendario-eventos__control-fecha,
+    .calendario-eventos__control:hover .calendario-eventos__control-busqueda {
+      background-color: #ff6f61; /* Fondo oscuro */
       color: #fff;
     }
+
+    /* Placeholders de los inputs */
+    .calendario-eventos__control:hover .calendario-eventos__control-texto::placeholder,
+    .calendario-eventos__control:hover .calendario-eventos__control-fecha::placeholder,
+    .calendario-eventos__control:hover .calendario-eventos__control-busqueda::placeholder {
+      color: #fff;
+    }
+
+  /* Botón X */
+  .calendario-eventos__control:hover .calendario-eventos__borrar-campo,
+  .calendario-eventos__control:hover .calendario-eventos__control-fecha-borrar {
+    color: #fff;
+  }
+
+
+
+
     .calendario-eventos__borrar-campo {
       position: absolute;
       right: 0.5rem;
@@ -151,10 +182,8 @@
     /* Rango de Fechas (Flatpickr) */
     .calendario-eventos__control-fecha-wrapper {
       position: relative;
-      /* display: inline-block; */
       display: flex;
       flex-direction: row;
-      /* width: 100%; */
       width: 14rem;
     }
     .calendario-eventos__control-fecha {
