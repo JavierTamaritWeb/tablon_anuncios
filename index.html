@@ -96,6 +96,7 @@
       font-size: 0.9rem;
       color: #333;
       position: relative;
+      padding: 0 2rem;
     }
     .calendario-eventos__control label {
       margin-bottom: 0.3rem;
@@ -150,8 +151,11 @@
     /* Rango de Fechas (Flatpickr) */
     .calendario-eventos__control-fecha-wrapper {
       position: relative;
-      display: inline-block;
-      width: 100%;
+      /* display: inline-block; */
+      display: flex;
+      flex-direction: row;
+      /* width: 100%; */
+      width: 14rem;
     }
     .calendario-eventos__control-fecha {
       width: 100%;
