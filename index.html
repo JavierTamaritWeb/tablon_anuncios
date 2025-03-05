@@ -28,7 +28,7 @@
     }
     .calendario-eventos__cabecera-titulo {
       font-size: 2.5rem;
-      color: #ff6f61; /* primary-color */
+      color: #ff6f61;
       margin: 0;
     }
     /* =============================
@@ -251,12 +251,10 @@
       transition: background-color 0.3s ease, color 0.3s ease;
       cursor: pointer;
     }
-    /* Hover para el mini calendario (se mantiene si ya hay clases específicas) */
     .calendario-eventos__mini-dia:hover {
       background-color: #00909E;
       color: #fff;
     }
-    /* Clase para la celda seleccionada con efecto "pulse" */
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.05); }
@@ -265,7 +263,6 @@
     .calendario-eventos__mini-dia.seleccionado {
       animation: pulse 0.5s ease-in-out;
     }
-    /* Badge para indicar múltiples eventos */
     .badge {
       position: absolute;
       top: 2px;
@@ -276,7 +273,6 @@
       padding: 2px 5px;
       font-size: 0.7rem;
     }
-    /* Clases para celdas con categorías ya definidas */
     .calendario-eventos__mini-dia.mini-festivo {
       background-color: #FF6F61;
       color: #fff;
@@ -344,6 +340,7 @@
       border-radius: 8px;
       padding: 1.5rem;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
     }
     .calendario-eventos__item:hover {
       transform: translateY(-5px);
@@ -390,11 +387,62 @@
     .modo-sencillo .avanzado {
       display: none;
     }
+    /* ===== MODAL ICS ===== */
+    .ics-modal.oculto {
+      display: none;
+    }
+    .ics-modal {
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .ics-modal__contenido {
+      background-color: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      width: 300px;
+      position: relative;
+    }
+    .ics-modal__cerrar {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+    .ics-modal__input,
+    .ics-modal__textarea {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .ics-modal__boton {
+      background-color: #ff6f61;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+    }
+    .ics-modal__boton:hover {
+      background-color: #444;
+    }
   </style>
 </head>
 <body>
   <div class="calendario-eventos modo-sencillo" id="calendarioContenedor">
-    <!-- Acciones: Botones de quitar filtros y alternar modo -->
+    <!-- Acciones -->
     <div class="calendario-eventos__acciones">
       <button class="calendario-eventos__boton-quitar" id="botonQuitarFiltros">Quitar Filtros (Alt+R)</button>
       <button class="calendario-eventos__modo-boton" id="botonModo">Cambiar a Modo Avanzado</button>
@@ -404,14 +452,11 @@
     </header>
     <!-- Controles de filtrado -->
     <div class="calendario-eventos__controles">
-      <!-- Fila 1: Buscar, Rango de Fechas, Categoría -->
       <div class="calendario-eventos__fila fila-basica">
-        <!-- Buscar -->
         <div class="calendario-eventos__control">
           <label for="filtro-busqueda">Buscar</label>
           <input type="text" id="filtro-busqueda" class="calendario-eventos__control-busqueda" placeholder="Palabras clave">
         </div>
-        <!-- Rango de Fechas (dd/mm/aaaa a dd/mm/aaaa) -->
         <div class="calendario-eventos__control">
           <label for="filtro-rango-fecha">Rango de fechas</label>
           <div class="calendario-eventos__control-fecha-wrapper">
@@ -419,7 +464,6 @@
             <button id="borrar-rango-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
           </div>
         </div>
-        <!-- Categoría -->
         <div class="calendario-eventos__control">
           <label for="filtro-categoria">Categoría</label>
           <select id="filtro-categoria" class="calendario-eventos__control-texto">
@@ -433,7 +477,6 @@
           </select>
         </div>
       </div>
-      <!-- Fila 2: Fecha puntual (modo avanzado) -->
       <div class="calendario-eventos__fila fila-avanzada avanzado">
         <div class="calendario-eventos__control">
           <label for="filtro-fecha">Fecha puntual</label>
@@ -443,9 +486,7 @@
           </div>
         </div>
       </div>
-      <!-- Fila 3: Día, Mes, Año (modo avanzado) -->
       <div class="calendario-eventos__fila fila-avanzada avanzado">
-        <!-- Día -->
         <div class="calendario-eventos__control">
           <label for="filtro-dia">Día (2 dígitos)</label>
           <div class="calendario-eventos__campo-wrapper">
@@ -453,7 +494,6 @@
             <button class="calendario-eventos__borrar-campo" id="borrar-dia">✕</button>
           </div>
         </div>
-        <!-- Mes -->
         <div class="calendario-eventos__control">
           <label for="filtro-mes">Mes (2 dígitos)</label>
           <div class="calendario-eventos__campo-wrapper">
@@ -461,7 +501,6 @@
             <button class="calendario-eventos__borrar-campo" id="borrar-mes">✕</button>
           </div>
         </div>
-        <!-- Año -->
         <div class="calendario-eventos__control">
           <label for="filtro-ano">Año (4 dígitos)</label>
           <div class="calendario-eventos__campo-wrapper">
@@ -482,6 +521,24 @@
     <!-- Lista de anuncios -->
     <div class="calendario-eventos__lista" id="lista-anuncios"></div>
   </div>
+
+  <!-- MODAL ICS (oculto por defecto) -->
+  <div id="icsModal" class="ics-modal oculto">
+    <div class="ics-modal__contenido">
+      <button class="ics-modal__cerrar" id="icsCerrarBtn">×</button>
+      <h2 id="icsModalTitulo">Día 18 (Martes)</h2>
+      <label for="icsEvento">Evento</label>
+      <input type="text" id="icsEvento" class="ics-modal__input" value="Falla">
+      <label for="icsHoraInicio">Hora inicial</label>
+      <input type="time" id="icsHoraInicio" class="ics-modal__input" value="00:00">
+      <label for="icsHoraFin">Hora final</label>
+      <input type="time" id="icsHoraFin" class="ics-modal__input" value="23:59">
+      <label for="icsNotas">Notas</label>
+      <textarea id="icsNotas" class="ics-modal__textarea" placeholder="Introduzca sus notas"></textarea>
+      <button id="icsAceptarBtn" class="ics-modal__boton">ACEPTAR</button>
+    </div>
+  </div>
+
   <!-- Flatpickr JS -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
@@ -591,12 +648,9 @@
     }
     
     /********************************************
-     * 1. Integración dinámica con filtros y eventos
+     * Integración dinámica con filtros y eventos
      ********************************************/
-    
-    // Función para actualizar los inputs al hacer clic en una celda del mini calendario
     function actualizarFiltrosConCelda(celda, dia, mes, anio) {
-      // Formatear día y mes con ceros a la izquierda
       const diaStr = String(dia).padStart(2, "0");
       const mesStr = String(mes + 1).padStart(2, "0");
       document.getElementById('filtro-dia').value = diaStr;
@@ -604,64 +658,46 @@
       document.getElementById('filtro-ano').value = String(anio);
       actualizarVista();
     }
-    
-    // Función para resaltar la celda seleccionada
     function resaltarCeldaSeleccionada(celda) {
-      // Eliminar la clase .seleccionado de todas las celdas
       const celdas = document.querySelectorAll('.calendario-eventos__mini-dia');
       celdas.forEach(el => el.classList.remove('seleccionado'));
       celda.classList.add('seleccionado');
-      // Opcional: remover la clase después de la animación
       setTimeout(() => {
         celda.classList.remove('seleccionado');
       }, 500);
     }
     
     /********************************************
-     * 2. Optimización de la generación del mini calendario
+     * Optimización de la generación del mini calendario
      ********************************************/
-    
-    // a. Función para calcular el offset (celdas vacías)
     function calcularOffset(mes, anio) {
       const primerDia = new Date(anio, mes, 1).getDay();
       return (primerDia === 0) ? 6 : primerDia - 1;
     }
-    
-    // b. Función para crear una celda de día (con badge si hay más de 1 evento)
     function crearCeldaDia(d, mes, anio, eventosDelDia) {
       const celda = document.createElement('div');
       celda.className = 'calendario-eventos__mini-dia';
       celda.textContent = d;
-    
-      // Si hay más de un evento, agregar badge
       if (eventosDelDia.length > 1) {
         const badge = document.createElement('span');
         badge.className = 'badge';
         badge.textContent = eventosDelDia.length;
         celda.appendChild(badge);
       }
-    
-      // Si hay algún evento, agregar tooltip
       if (eventosDelDia.length > 0) {
         const tooltip = document.createElement('div');
         tooltip.className = 'calendario-eventos__tooltip';
         tooltip.textContent = eventosDelDia.map(e => e.title).join(", ");
         celda.appendChild(tooltip);
       }
-    
-      // Añadir evento click: actualiza filtros, resalta y actualiza la vista
       celda.addEventListener('click', () => {
         actualizarFiltrosConCelda(celda, d, mes, anio);
         resaltarCeldaSeleccionada(celda);
       });
-    
       return celda;
     }
-    
-    // c. Función para construir la cuadrícula completa usando DocumentFragment
     function construirCuadricula(mes, anio, eventosFiltrados) {
       const fragment = document.createDocumentFragment();
-      // Encabezados de la semana
       const diasSemana = ["L", "M", "X", "J", "V", "S", "D"];
       diasSemana.forEach(dia => {
         const celda = document.createElement('div');
@@ -669,20 +705,17 @@
         celda.textContent = dia;
         fragment.appendChild(celda);
       });
-      // Celdas vacías para offset
       const offset = calcularOffset(mes, anio);
       for (let i = 0; i < offset; i++) {
         const vacio = document.createElement('div');
         vacio.className = 'calendario-eventos__mini-dia';
         fragment.appendChild(vacio);
       }
-      // Generar celdas para cada día del mes
       const numDias = new Date(anio, mes + 1, 0).getDate();
       for (let d = 1; d <= numDias; d++) {
         const fechaCelda = `${anio}-${String(mes + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
         const eventosDelDia = eventosFiltrados.filter(ev => ev.date === fechaCelda);
         const celdaDia = crearCeldaDia(d, mes, anio, eventosDelDia);
-        // Si el día coincide con el día actual, se agrega la clase "hoy"
         const hoy = new Date();
         if (anio === hoy.getFullYear() && mes === hoy.getMonth() && d === hoy.getDate()) {
           celdaDia.classList.add('hoy');
@@ -691,32 +724,19 @@
       }
       return fragment;
     }
-    
-    // d. Función que actualiza el mini calendario con un efecto fade in/out
     function generarMiniCalendario(mes, anio, eventosFiltrados) {
       const contenedor = document.getElementById('mini-calendario');
-      // Aplicar fade out
       contenedor.style.opacity = 0;
       setTimeout(() => {
-        // Construir la cuadrícula usando DocumentFragment
         const fragment = construirCuadricula(mes, anio, eventosFiltrados);
         contenedor.innerHTML = "";
         contenedor.appendChild(fragment);
-        // Aplicar fade in
         contenedor.style.opacity = 1;
       }, 100);
     }
     
     /********************************************
-     * 3. Animaciones y transiciones más suaves
-     ********************************************/
-    
-    // La transición de hover en las celdas ya se define en CSS.
-    // Se agregó la animación "pulse" en la clase .seleccionado (ver CSS arriba).
-    
-    /********************************************
-     * Función: filtrarEventos
-     * (Combina filtros: búsqueda, categoría, fecha puntual, día, mes, año, rango)
+     * Filtrar eventos
      ********************************************/
     function filtrarEventos() {
       const busqueda     = document.getElementById('filtro-busqueda').value.trim().toLowerCase();
@@ -726,13 +746,10 @@
       const mesFiltro    = document.getElementById('filtro-mes').value.trim();
       const anoFiltro    = document.getElementById('filtro-ano').value.trim();
       const rangoStr     = document.getElementById('filtro-rango-fecha').value.trim();
-    
-      // Sin filtros => []
+
       if (!busqueda && !categoria && !fechaPuntual && !diaFiltro && !mesFiltro && !anoFiltro && !rangoStr) {
         return [];
       }
-    
-      // Para el rango, se usa la instancia de Flatpickr
       let fechaInicio = null;
       let fechaFin = null;
       const fp = document.getElementById('filtro-rango-fecha')._flatpickr;
@@ -740,11 +757,8 @@
         fechaInicio = fp.selectedDates[0];
         fechaFin = fp.selectedDates[1];
       }
-    
       return eventos.filter(e => {
         let coincide = true;
-    
-        // Búsqueda en título o descripción
         if (busqueda) {
           const titulo = e.title.toLowerCase();
           const desc   = e.description.toLowerCase();
@@ -752,66 +766,47 @@
             coincide = false;
           }
         }
-    
-        // Filtro por año
         if (coincide && anoFiltro) {
           if (!e.date.startsWith(anoFiltro)) {
             coincide = false;
           }
         }
-    
-        // Filtro por día
         if (coincide && diaFiltro) {
           const diaEvento = e.date.substring(8, 10);
           if (diaEvento !== diaFiltro.padStart(2, "0")) {
             coincide = false;
           }
         }
-    
-        // Filtro por categoría
         if (coincide && categoria) {
           if (e.category !== categoria) {
             coincide = false;
           }
         }
-    
-        // Filtro por fecha puntual
         if (coincide && fechaPuntual) {
           if (e.date !== fechaPuntual) {
             coincide = false;
           }
         }
-    
-        // Filtro por mes
         if (coincide && mesFiltro) {
           const mesEvento = e.date.substring(5, 7);
           if (mesEvento !== mesFiltro.padStart(2, "0")) {
             coincide = false;
           }
         }
-    
-        // Filtro por rango de fechas
         if (coincide && fechaInicio && fechaFin) {
           if (!cumpleRango(e.date, fechaInicio, fechaFin)) {
             coincide = false;
           }
         }
-    
         return coincide;
       });
     }
     
-    /********************************************
-     * Función: actualizarLeyenda
-     ********************************************/
     function actualizarLeyenda(mes, anio) {
       const infoMes = document.getElementById('info-mes');
       infoMes.textContent = `Mostrando eventos de ${MESES[mes]} ${anio}`;
     }
     
-    /********************************************
-     * Función: mostrarDescripcionMes
-     ********************************************/
     function mostrarDescripcionMes(eventosDelMes, mes, anio) {
       const contenedor = document.getElementById('descripcion-eventos-mes');
       contenedor.innerHTML = '';
@@ -835,7 +830,15 @@
     }
     
     /********************************************
-     * Función: renderizarLista
+     * Función: obtenerNombreDia
+     ********************************************/
+    function obtenerNombreDia(dateObj) {
+      const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+      return dias[dateObj.getDay()];
+    }
+    
+    /********************************************
+     * Renderizar lista de eventos (con modal ICS al hacer click en la tarjeta)
      ********************************************/
     function renderizarLista(eventosFiltrados) {
       const lista = document.getElementById('lista-anuncios');
@@ -875,13 +878,24 @@
             <span>${e.category}</span>
           </div>
         `;
+        // Al hacer clic en la tarjeta se abre el modal ICS
+        div.addEventListener('click', () => {
+          const [year, m, d] = e.date.split('-').map(Number);
+          const dateObj = new Date(year, m - 1, d);
+          const dayName = obtenerNombreDia(dateObj);
+          abrirICSModal({
+            date: d,
+            dayName,
+            eventTitle: e.title,
+            startTime: "00:00",
+            endTime: "23:59",
+            notes: e.description
+          });
+        });
         lista.appendChild(div);
       });
     }
     
-    /********************************************
-     * Función: actualizarVista
-     ********************************************/
     function actualizarVista() {
       const filtrados = filtrarEventos();
       renderizarLista(filtrados);
@@ -901,9 +915,6 @@
       generarMiniCalendario(mes, anio, filtrados);
     }
     
-    /********************************************
-     * Función: resetearFiltros
-     ********************************************/
     function resetearFiltros() {
       document.getElementById('filtro-busqueda').value = '';
       document.getElementById('filtro-categoria').value = '';
@@ -917,9 +928,6 @@
       actualizarVista();
     }
     
-    /********************************************
-     * Función: toggleModo
-     ********************************************/
     function toggleModo() {
       const contenedor = document.getElementById('calendarioContenedor');
       const boton = document.getElementById('botonModo');
@@ -934,18 +942,12 @@
       }
     }
     
-    /********************************************
-     * Función: manejarAtajos (Alt+R)
-     ********************************************/
     function manejarAtajos(e) {
       if (e.altKey && e.key.toLowerCase() === 'r') {
         resetearFiltros();
       }
     }
     
-    /********************************************
-     * Función: asignarEventos
-     ********************************************/
     function asignarEventos() {
       const controles = document.querySelectorAll(
         '#filtro-busqueda, #filtro-categoria, #filtro-fecha, #filtro-dia, #filtro-mes, #filtro-ano'
@@ -979,6 +981,97 @@
       document.getElementById('botonQuitarFiltros').addEventListener('click', resetearFiltros);
       document.getElementById('botonModo').addEventListener('click', toggleModo);
       document.addEventListener('keydown', manejarAtajos);
+    }
+    
+    /********************************************
+     * MODAL ICS: Variables y funciones
+     ********************************************/
+    const icsModal = document.getElementById('icsModal');
+    const icsCerrarBtn = document.getElementById('icsCerrarBtn');
+    const icsAceptarBtn = document.getElementById('icsAceptarBtn');
+    
+    const icsModalTitulo = document.getElementById('icsModalTitulo');
+    const icsEventoInput = document.getElementById('icsEvento');
+    const icsHoraInicio = document.getElementById('icsHoraInicio');
+    const icsHoraFin = document.getElementById('icsHoraFin');
+    const icsNotas = document.getElementById('icsNotas');
+    
+    function abrirICSModal({ date, dayName, eventTitle, startTime, endTime, notes }) {
+      icsModalTitulo.textContent = `Día ${date} (${dayName})`;
+      icsEventoInput.value = eventTitle || "";
+      icsHoraInicio.value = startTime || "00:00";
+      icsHoraFin.value = endTime || "23:59";
+      icsNotas.value = notes || "";
+      icsModal.classList.remove('oculto');
+    }
+    function cerrarICSModal() {
+      icsModal.classList.add('oculto');
+    }
+    icsCerrarBtn.addEventListener('click', cerrarICSModal);
+    icsAceptarBtn.addEventListener('click', () => {
+      const titulo = icsModalTitulo.textContent;
+      const [ , rawDay ] = titulo.split(" ");
+      const eventTitle = icsEventoInput.value;
+      const startTime = icsHoraInicio.value;
+      const endTime = icsHoraFin.value;
+      const notes = icsNotas.value;
+      const icsData = generarICS({
+        dayLabel: rawDay,
+        eventTitle,
+        startTime,
+        endTime,
+        notes
+      });
+      const blob = new Blob([icsData], { type: 'text/calendar' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'evento.ics';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      cerrarICSModal();
+    });
+    function generarICS({ dayLabel, eventTitle, startTime, endTime, notes }) {
+      // Para este ejemplo se usa una fecha fija; en producción, utilizar la fecha real del evento.
+      const fakeDate = new Date(2025, 2, 18);
+      const dtStamp = formatearFechaICS(new Date());
+      const dtStart = formatearFechaICS(combinarFechaHora(fakeDate, startTime));
+      const dtEnd   = formatearFechaICS(combinarFechaHora(fakeDate, endTime));
+      return `
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Falla Suïssa
+BEGIN:VEVENT
+UID:${Date.now()}-falla-suissa
+DTSTAMP:${dtStamp}
+DTSTART:${dtStart}
+DTEND:${dtEnd}
+SUMMARY:${limpiarICS(eventTitle)}
+DESCRIPTION:${limpiarICS(notes)}
+END:VEVENT
+END:VCALENDAR
+      `.trim();
+    }
+    function formatearFechaICS(dateObj) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const hours = String(dateObj.getHours()).padStart(2, '0');
+      const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+      const seconds = String(dateObj.getSeconds()).padStart(2, '0');
+      return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+    }
+    function combinarFechaHora(dateObj, hhmm) {
+      const [hh, mm] = hhmm.split(':').map(Number);
+      const newDate = new Date(dateObj);
+      newDate.setHours(hh || 0, mm || 0, 0, 0);
+      return newDate;
+    }
+    function limpiarICS(str) {
+      return (str || "")
+        .replace(/(\r\n|\r|\n)/g, "\\n")
+        .replace(/,/g, "\\,");
     }
     
     /********************************************
