@@ -28,10 +28,9 @@
     }
     .calendario-eventos__cabecera-titulo {
       font-size: 2.5rem;
-      color: #ff6f61; /* primary-color */
+      color: #ff6f61;
       margin: 0;
     }
-
     /* =============================
        ACCIONES: Botones superiores
     ============================= */
@@ -57,7 +56,6 @@
       background-color: #444;
       color: #fff;
     }
-
     /* =============================
        CONTROLES DE FILTRO
     ============================= */
@@ -426,7 +424,7 @@
       background: transparent;
       border: none;
       font-size: 2.2rem;
-      color: #ff6f61; /* color principal */
+      color: #ff6f61;
       cursor: pointer;
     }
     .ics-modal__cerrar:hover {
@@ -436,7 +434,7 @@
       margin-top: 0;
       margin-bottom: 1rem;
       font-size: 1.4rem;
-      color: #ff6f61; /* color principal */
+      color: #ff6f61;
     }
     .ics-modal__label {
       display: block;
@@ -451,11 +449,10 @@
       padding: 0.5rem;
       border: none;
       border-radius: 5px;
-      background-color: #333; 
-      color: #fff; 
+      background-color: #333;
+      color: #fff;
       font-size: 1rem;
       transition: background-color 0.3s ease, color 0.3s ease;
-      
     }
     .ics-modal__input::placeholder,
     .ics-modal__textarea::placeholder {
@@ -464,19 +461,17 @@
     .ics-modal__input:hover,
     .ics-modal__textarea:hover {
       background-color: #00909E;
-      color:#000;
+      color: #000;
     }
     /* Botón ACEPTAR: centrado en pantallas grandes, ancho completo en pantallas < 768px */
     .ics-modal__boton {
-      background-color: #ff6f61; 
+      background-color: #ff6f61;
       color: #fff;
       border: none;
       border-radius: 5px;
       padding: 0.6rem 1rem;
       cursor: pointer;
       font-weight: bold;
-
-      /* Para pantallas grandes, centrado */
       display: block;
       margin: 0 auto;
       width: auto;
@@ -488,11 +483,11 @@
     @media (max-width: 768px) {
       .ics-modal__boton {
         width: 100%;
-        margin: 0; 
+        margin: 0;
       }
-
     }
-        /* Oculta el indicador del picker en navegadores WebKit */
+
+    /* Oculta el indicador del picker en navegadores WebKit */
     input[type="time"]::-webkit-calendar-picker-indicator {
       display: none;
     }
@@ -517,34 +512,20 @@
         <!-- Buscar -->
         <div class="calendario-eventos__control">
           <label for="filtro-busqueda">Buscar</label>
-          <input 
-            type="text" 
-            id="filtro-busqueda" 
-            class="calendario-eventos__control-busqueda" 
-            placeholder="Palabras clave"
-          >
+          <input type="text" id="filtro-busqueda" class="calendario-eventos__control-busqueda" placeholder="Palabras clave">
         </div>
         <!-- Rango de Fechas (dd/mm/aaaa a dd/mm/aaaa) -->
         <div class="calendario-eventos__control">
           <label for="filtro-rango-fecha">Rango de fechas</label>
           <div class="calendario-eventos__control-fecha-wrapper">
-            <input 
-              type="text" 
-              id="filtro-rango-fecha" 
-              class="calendario-eventos__control-fecha" 
-              placeholder="dd/mm/aaaa a dd/mm/aaaa"
-              required
-            >
+            <input type="text" id="filtro-rango-fecha" class="calendario-eventos__control-fecha" placeholder="dd/mm/aaaa a dd/mm/aaaa" required>
             <button id="borrar-rango-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
           </div>
         </div>
         <!-- Categoría -->
         <div class="calendario-eventos__control">
           <label for="filtro-categoria">Categoría</label>
-          <select 
-            id="filtro-categoria" 
-            class="calendario-eventos__control-texto"
-          >
+          <select id="filtro-categoria" class="calendario-eventos__control-texto">
             <option value="">Todas</option>
             <option value="Festivo">Festivo</option>
             <option value="Falla">Falla</option>
@@ -561,12 +542,7 @@
         <div class="calendario-eventos__control">
           <label for="filtro-fecha">Fecha puntual</label>
           <div class="calendario-eventos__control-fecha-wrapper">
-            <input 
-              type="date" 
-              id="filtro-fecha" 
-              class="calendario-eventos__control-fecha" 
-              placeholder="YYYY-MM-DD"
-            >
+            <input type="date" id="filtro-fecha" class="calendario-eventos__control-fecha" placeholder="YYYY-MM-DD">
             <button id="borrar-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
           </div>
         </div>
@@ -578,16 +554,7 @@
         <div class="calendario-eventos__control">
           <label for="filtro-dia">Día (2 dígitos)</label>
           <div class="calendario-eventos__campo-wrapper">
-            <input 
-              type="text" 
-              id="filtro-dia"
-              class="calendario-eventos__control-texto"
-              placeholder="DD"
-              maxlength="2"
-              pattern="^\\d{1,2}$"
-              inputmode="numeric"
-              title="Día entre 01 y 31"
-            >
+            <input type="text" id="filtro-dia" class="calendario-eventos__control-texto" placeholder="DD" maxlength="2" pattern="^\\d{1,2}$" inputmode="numeric" title="Día entre 01 y 31">
             <button class="calendario-eventos__borrar-campo" id="borrar-dia">✕</button>
           </div>
         </div>
@@ -595,16 +562,7 @@
         <div class="calendario-eventos__control">
           <label for="filtro-mes">Mes (2 dígitos)</label>
           <div class="calendario-eventos__campo-wrapper">
-            <input 
-              type="text" 
-              id="filtro-mes"
-              class="calendario-eventos__control-texto"
-              placeholder="MM"
-              maxlength="2"
-              pattern="^\\d{1,2}$"
-              inputmode="numeric"
-              title="Mes entre 01 y 12"
-            >
+            <input type="text" id="filtro-mes" class="calendario-eventos__control-texto" placeholder="MM" maxlength="2" pattern="^\\d{1,2}$" inputmode="numeric" title="Mes entre 01 y 12">
             <button class="calendario-eventos__borrar-campo" id="borrar-mes">✕</button>
           </div>
         </div>
@@ -612,16 +570,7 @@
         <div class="calendario-eventos__control">
           <label for="filtro-ano">Año (4 dígitos)</label>
           <div class="calendario-eventos__campo-wrapper">
-            <input 
-              type="text" 
-              id="filtro-ano"
-              class="calendario-eventos__control-texto"
-              placeholder="YYYY"
-              maxlength="4"
-              pattern="^\\d{4}$"
-              inputmode="numeric"
-              title="Introduzca 4 dígitos (p.ej. 2025)"
-            >
+            <input type="text" id="filtro-ano" class="calendario-eventos__control-texto" placeholder="YYYY" maxlength="4" pattern="^\\d{4}$" inputmode="numeric" title="Introduzca 4 dígitos (p.ej. 2025)">
             <button class="calendario-eventos__borrar-campo" id="borrar-ano">✕</button>
           </div>
         </div>
@@ -633,7 +582,7 @@
 
     <!-- Mini Calendario (cuadrícula de días) -->
     <div class="calendario-eventos__mini" id="mini-calendario">
-      <!-- Se generará dinámicamente -->
+      <!-- Se genera dinámicamente -->
     </div>
 
     <!-- Descripción detallada de los eventos del mes -->
@@ -650,7 +599,7 @@
       <h2 id="icsModalTitulo" class="ics-modal__titulo">Día 19 (Miércoles)</h2>
 
       <label for="icsEvento" class="ics-modal__label">Evento</label>
-      <input type="text" id="icsEvento" class="ics-modal__input" value="San José">
+      <input type="text" id="icsEvento" class="ics-modal__input" value="">
 
       <label for="icsHoraInicio" class="ics-modal__label">Hora inicial</label>
       <input type="time" id="icsHoraInicio" class="ics-modal__input" value="00:00">
@@ -665,13 +614,13 @@
     </div>
   </div>
 
-  <!-- Flatpickr JS (Date Range Picker) -->
+  <!-- Flatpickr JS -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
     /********************************************
      * Datos COMPLETOS
      ********************************************/
-     const eventos = [
+    const eventos = [
       { id: 1, title: "Año Nuevo", description: "Celebración del Año Nuevo", date: "2025-01-01", category: "Festivo" },
       { id: 2, title: "Epifanía del Señor", description: "Celebración de la Epifanía", date: "2025-01-06", category: "Festivo" },
       { id: 3, title: "San Vicente Mártir", description: "Festividad en honor a San Vicente", date: "2025-01-22", category: "Festivo" },
@@ -792,6 +741,10 @@
         celda.classList.remove('seleccionado');
       }, 500);
     }
+    
+    /********************************************
+     * Optimización de la generación del mini calendario
+     ********************************************/
     function calcularOffset(mes, anio) {
       const primerDia = new Date(anio, mes, 1).getDay();
       return (primerDia === 0) ? 6 : primerDia - 1;
@@ -812,9 +765,22 @@
         tooltip.textContent = eventosDelDia.map(e => e.title).join(", ");
         celda.appendChild(tooltip);
       }
+      // Al hacer clic en la celda del mini calendario:
       celda.addEventListener('click', () => {
         actualizarFiltrosConCelda(celda, d, mes, anio);
         resaltarCeldaSeleccionada(celda);
+        // Abrir modal ICS siempre, incluso si no hay eventos en el día
+        const dateObj = new Date(anio, mes, d);
+        const dayName = obtenerNombreDia(dateObj);
+        // Puedes establecer valores por defecto o dejar en blanco para crear un nuevo evento
+        abrirICSModal({
+          date: d,
+          dayName: dayName,
+          eventTitle: "",
+          startTime: "00:00",
+          endTime: "23:59",
+          notes: ""
+        });
       });
       return celda;
     }
@@ -881,7 +847,6 @@
       }
       return eventos.filter(e => {
         let coincide = true;
-        // Búsqueda en título o descripción
         if (busqueda) {
           const titulo = e.title.toLowerCase();
           const desc   = e.description.toLowerCase();
@@ -889,39 +854,33 @@
             coincide = false;
           }
         }
-        // Filtro por año
         if (coincide && anoFiltro) {
           if (!e.date.startsWith(anoFiltro)) {
             coincide = false;
           }
         }
-        // Filtro por día
         if (coincide && diaFiltro) {
           const diaEvento = e.date.substring(8, 10);
           if (diaEvento !== diaFiltro.padStart(2, "0")) {
             coincide = false;
           }
         }
-        // Filtro por categoría
         if (coincide && categoria) {
           if (e.category !== categoria) {
             coincide = false;
           }
         }
-        // Filtro por fecha puntual
         if (coincide && fechaPuntual) {
           if (e.date !== fechaPuntual) {
             coincide = false;
           }
         }
-        // Filtro por mes
         if (coincide && mesFiltro) {
           const mesEvento = e.date.substring(5, 7);
           if (mesEvento !== mesFiltro.padStart(2, "0")) {
             coincide = false;
           }
         }
-        // Filtro por rango de fechas
         if (coincide && fechaInicio && fechaFin) {
           if (!cumpleRango(e.date, fechaInicio, fechaFin)) {
             coincide = false;
@@ -967,7 +926,7 @@
     }
     
     /********************************************
-     * Renderizar lista de eventos
+     * Renderizar lista de eventos (con modal ICS al hacer clic en la tarjeta)
      ********************************************/
     function renderizarLista(eventosFiltrados) {
       const lista = document.getElementById('lista-anuncios');
@@ -1007,7 +966,7 @@
             <span>${e.category}</span>
           </div>
         `;
-        // Al hacer clic en la tarjeta => abrir modal ICS
+        // Al hacer clic en la tarjeta => abrir modal ICS con los datos del evento
         div.addEventListener('click', () => {
           const [year, m, d] = e.date.split('-').map(Number);
           const dateObj = new Date(year, m - 1, d);
@@ -1128,7 +1087,7 @@
     }
     
     /********************************************
-     * MODAL ICS: abrir, cerrar, generar .ics
+     * MODAL ICS: Variables y funciones
      ********************************************/
     const icsModal = document.getElementById('icsModal');
     const icsCerrarBtn = document.getElementById('icsCerrarBtn');
@@ -1154,7 +1113,7 @@
     icsCerrarBtn.addEventListener('click', cerrarICSModal);
     
     icsAceptarBtn.addEventListener('click', () => {
-      const titulo = icsModalTitulo.textContent; 
+      const titulo = icsModalTitulo.textContent;
       const [ , rawDay ] = titulo.split(" "); 
       const eventTitle = icsEventoInput.value;
       const startTime = icsHoraInicio.value;
@@ -1179,7 +1138,7 @@
     });
     
     function generarICS({ dayLabel, eventTitle, startTime, endTime, notes }) {
-      // Ejemplo: fecha fija. En producción, usar la fecha real del evento.
+      // Para este ejemplo se usa una fecha fija; en producción, usar la fecha real del evento.
       const fakeDate = new Date(2025, 2, 18);
       const dtStamp = formatearFechaICS(new Date());
       const dtStart = formatearFechaICS(combinarFechaHora(fakeDate, startTime));
