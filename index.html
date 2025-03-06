@@ -140,12 +140,43 @@
       cursor: pointer;
       transition: color var(--transicion);
     }
-    .calendario-eventos__borrar-campo:hover { color: red; }
+    .calendario-eventos__borrar-campo:hover { color: white; }
     .calendario-eventos__campo-wrapper {
       position: relative;
       display: inline-block;
       width: 100%;
+      transition: blackground-color 300ms ease;
+      transition: color ;
     }
+    /* Estilo inicial del placeholder */
+    .calendario-eventos__control-texto::placeholder {
+      
+      transition: color 0.3s ease;
+    }
+
+    .calendario-eventos__control-texto:hover::placeholder {
+      color: #fff; /* Ejemplo: rojo */
+    }
+
+    .calendario-eventos__control-fecha::placeholder {
+      
+      transition: color 0.3s ease;
+    }
+    .calendario-eventos__control-fecha:hover::placeholder {
+      color: #fff; /* Ejemplo: rojo */
+    }
+
+
+ 
+    .calendario-eventos__control-busqueda::placeholder {
+      
+      transition: color 0.3s ease;
+    }
+    .calendario-eventos__control-busqueda:hover::placeholder {
+      color: #fff; /* Ejemplo: rojo */
+    }
+
+
     .calendario-eventos__control-fecha-wrapper {
       position: relative;
       display: flex;
@@ -180,6 +211,16 @@
     .calendario-eventos__control-fecha-wrapper:hover .calendario-eventos__control-fecha-borrar {
       color: #fff;
     }
+
+
+    .calendario-eventos__control-texto {
+      transition: color 300ms ease;
+    }
+    .calendario-eventos__control-texto:hover {
+      color: #fff;
+    }
+
+
     .calendario-eventos__leyenda {
       margin: var(--espaciado) 0;
       font-size: 1.2rem;
@@ -444,7 +485,7 @@
       <button class="calendario-eventos__modo-boton" id="botonModo">Cambiar a Modo Avanzado</button>
     </div>
     <header class="calendario-eventos__cabecera">
-      <h1 class="calendario-eventos__cabecera-titulo">Calendario de Eventos</h1>
+      <h1 class="calendario-eventos__cabecera-titulo">Agenda de Eventos</h1>
     </header>
     <div class="calendario-eventos__controles">
       <div class="calendario-eventos__fila fila-basica">
@@ -455,7 +496,7 @@
         <div class="calendario-eventos__control">
           <label for="filtro-rango-fecha">Rango de fechas</label>
           <div class="calendario-eventos__control-fecha-wrapper">
-            <input type="text" id="filtro-rango-fecha" class="calendario-eventos__control-fecha" placeholder="dd/mm/aaaa a dd/mm/aaaa" required>
+            <input type="text" id="filtro-rango-fecha" class="calendario-eventos__control-fecha" placeholder="dd-mm-aaaa a dd-mm-aaaa" required>
             <button id="borrar-rango-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
           </div>
         </div>
@@ -476,7 +517,7 @@
         <div class="calendario-eventos__control">
           <label for="filtro-fecha">Fecha puntual</label>
           <div class="calendario-eventos__control-fecha-wrapper">
-            <input type="date" id="filtro-fecha" class="calendario-eventos__control-fecha" placeholder="YYYY-MM-DD">
+            <input type="date" id="filtro-fecha" class="calendario-eventos__control-fecha" placeholder="dd-mm-aaaa">
             <button id="borrar-fecha" class="calendario-eventos__control-fecha-borrar">✕</button>
           </div>
         </div>
@@ -485,21 +526,21 @@
         <div class="calendario-eventos__control">
           <label for="filtro-dia">Día (2 dígitos)</label>
           <div class="calendario-eventos__campo-wrapper">
-            <input type="text" id="filtro-dia" class="calendario-eventos__control-texto" placeholder="DD" maxlength="2" pattern="^\\d{1,2}$" inputmode="numeric" title="Día entre 01 y 31">
+            <input type="text" id="filtro-dia" class="calendario-eventos__control-texto" placeholder="dd" maxlength="2" pattern="^\\d{1,2}$" inputmode="numeric" title="Día entre 01 y 31">
             <button class="calendario-eventos__borrar-campo" id="borrar-dia">✕</button>
           </div>
         </div>
         <div class="calendario-eventos__control">
           <label for="filtro-mes">Mes (2 dígitos)</label>
           <div class="calendario-eventos__campo-wrapper">
-            <input type="text" id="filtro-mes" class="calendario-eventos__control-texto" placeholder="MM" maxlength="2" pattern="^\\d{1,2}$" inputmode="numeric" title="Mes entre 01 y 12">
+            <input type="text" id="filtro-mes" class="calendario-eventos__control-texto" placeholder="mm" maxlength="2" pattern="^\\d{1,2}$" inputmode="numeric" title="Mes entre 01 y 12">
             <button class="calendario-eventos__borrar-campo" id="borrar-mes">✕</button>
           </div>
         </div>
         <div class="calendario-eventos__control">
           <label for="filtro-ano">Año (4 dígitos)</label>
           <div class="calendario-eventos__campo-wrapper">
-            <input type="text" id="filtro-ano" class="calendario-eventos__control-texto" placeholder="YYYY" maxlength="4" pattern="^\\d{4}$" inputmode="numeric" title="Introduzca 4 dígitos (p.ej. 2025)">
+            <input type="text" id="filtro-ano" class="calendario-eventos__control-texto" placeholder="aaaa" maxlength="4" pattern="^\\d{4}$" inputmode="numeric" title="Introduzca 4 dígitos (p.ej. 2025)">
             <button class="calendario-eventos__borrar-campo" id="borrar-ano">✕</button>
           </div>
         </div>
