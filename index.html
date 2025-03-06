@@ -4,12 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Calendario de Eventos - Falla Suïssa</title>
-  <!-- Flatpickr CSS (para el Date Range Picker) -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
-    /* ===================================================
-       Variables CSS
-    =================================================== */
     :root {
       --color-urgente: #C13584;
       --color-recordatorio: #000080;
@@ -24,11 +20,6 @@
       --radio-borde: 8px;
       --transicion: 0.3s ease;
     }
-
-    /* ===================================================
-       Estilos base (Mobile-first)
-    =================================================== */
-
     body {
       font-family: Arial, sans-serif;
       background-color: var(--color-fondo);
@@ -36,7 +27,6 @@
       margin: 0;
       padding: 0;
     }
-
     .calendario-eventos {
       max-width: 900px;
       margin: 2rem auto;
@@ -47,7 +37,6 @@
       box-shadow: 0 4px 6px rgba(0,0,0,0.1);
       position: relative;
     }
-
     .calendario-eventos__cabecera {
       text-align: center;
       margin-bottom: 1.5rem;
@@ -58,8 +47,6 @@
       color: var(--color-festivo);
       margin: 0;
     }
-
-    /* Acciones (botones superiores) */
     .calendario-eventos__acciones {
       display: flex;
       justify-content: space-between;
@@ -82,8 +69,6 @@
       background-color: #444;
       color: #fff;
     }
-
-    /* Controles de filtro */
     .calendario-eventos__controles {
       margin-bottom: 1.5rem;
     }
@@ -94,19 +79,13 @@
       margin-bottom: 1rem;
     }
     @media (max-width: 480px) {
-      .calendario-eventos__fila {
-        grid-template-columns: 1fr;
-      }
+      .calendario-eventos__fila { grid-template-columns: 1fr; }
     }
     @media (min-width: 481px) and (max-width: 768px) {
-      .calendario-eventos__fila {
-        grid-template-columns: repeat(2, minmax(150px, 1fr));
-      }
+      .calendario-eventos__fila { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
     }
     @media (min-width: 769px) and (max-width: 1023px) {
-      .calendario-eventos__fila {
-        grid-template-columns: repeat(3, minmax(150px, 1fr));
-      }
+      .calendario-eventos__fila { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
     }
     @media (min-width: 1024px) {
       .calendario-eventos__fila {
@@ -122,9 +101,7 @@
       position: relative;
       padding: 0 2rem;
     }
-    .calendario-eventos__control label {
-      margin-bottom: 0.3rem;
-    }
+    .calendario-eventos__control label { margin-bottom: 0.3rem; }
     .calendario-eventos__control-texto,
     .calendario-eventos__control-fecha,
     .calendario-eventos__control-busqueda {
@@ -163,9 +140,7 @@
       cursor: pointer;
       transition: color var(--transicion);
     }
-    .calendario-eventos__borrar-campo:hover {
-      color: red;
-    }
+    .calendario-eventos__borrar-campo:hover { color: red; }
     .calendario-eventos__campo-wrapper {
       position: relative;
       display: inline-block;
@@ -205,8 +180,6 @@
     .calendario-eventos__control-fecha-wrapper:hover .calendario-eventos__control-fecha-borrar {
       color: #fff;
     }
-
-    /* Leyenda y descripción del mes */
     .calendario-eventos__leyenda {
       margin: var(--espaciado) 0;
       font-size: 1.2rem;
@@ -231,11 +204,9 @@
       margin-left: 1.5rem;
       list-style: disc;
     }
-    .calendario-eventos__detalles-mes li {
-      margin-bottom: 0.5rem;
-    }
+    .calendario-eventos__detalles-mes li { margin-bottom: 0.5rem; }
 
-    /* Mini Calendario */
+    /* MINI CALENDARIO */
     .calendario-eventos__mini {
       margin: var(--espaciado) 0;
       display: grid;
@@ -280,7 +251,6 @@
       padding: 2px 5px;
       font-size: 0.7rem;
     }
-    /* Indicador (dot) en la celda para cualquier día con evento */
     .calendario-eventos__mini-indicador {
       position: absolute;
       top: 2px;
@@ -289,7 +259,6 @@
       height: 8px;
       border-radius: 50%;
     }
-    /* Banda elegante: si hay 2 o más eventos, se agrega una banda inferior */
     .calendario-eventos__mini-banda {
       position: absolute;
       bottom: 0;
@@ -298,38 +267,7 @@
       height: 4px;
       border-radius: 0 0 4px 4px;
     }
-    /* Colores para la celda según categoría */
-    .calendario-eventos__mini-dia.mini-festivo {
-      background-color: var(--color-festivo);
-      color: #fff;
-    }
-    .calendario-eventos__mini-dia.mini-falla {
-      background-color: var(--color-falla);
-      color: #fff;
-    }
-    .calendario-eventos__mini-dia.mini-evento {
-      background-color: var(--color-evento);
-      color: #fff;
-    }
-    .calendario-eventos__mini-dia.mini-urgente {
-      background-color: var(--color-urgente);
-      color: #fff;
-    }
-    .calendario-eventos__mini-dia.mini-informacion {
-      background-color: var(--color-informacion);
-      color: #000;
-    }
-    .calendario-eventos__mini-dia.mini-recordatorio {
-      background-color: var(--color-recordatorio);
-      color: #fff;
-    }
-    .calendario-eventos__mini-dia.fin-sabado {
-      background-color: #e0e0e0;
-    }
-    .calendario-eventos__mini-dia.fin-domingo {
-      background-color: #ffcccc;
-      color: red;
-    }
+    .calendario-eventos__mini-dia.hoy { outline: 2px solid blue; }
     .calendario-eventos__tooltip {
       visibility: hidden;
       opacity: 0;
@@ -349,11 +287,8 @@
       visibility: visible;
       opacity: 1;
     }
-    .calendario-eventos__mini-dia.hoy {
-      outline: 2px solid blue;
-    }
 
-    /* Lista de eventos (Tarjetas) */
+    /* LISTA DE EVENTOS (Tarjetas) */
     .calendario-eventos__lista {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -387,28 +322,12 @@
       display: flex;
       justify-content: space-between;
     }
-    /* Clases para bordes laterales según categoría (si se quiere mantener) */
-    .calendario-eventos__item--festivo {
-      border-left: 6px solid var(--color-festivo);
-    }
-    .calendario-eventos__item--falla {
-      border-left: 6px solid var(--color-falla);
-    }
-    .calendario-eventos__item--evento {
-      border-left: 6px solid var(--color-evento);
-    }
-    .calendario-eventos__item--urgente {
-      border-left: 6px solid var(--color-urgente);
-    }
-    .calendario-eventos__item--informacion {
-      border-left: 6px solid var(--color-informacion);
-      color: #000;
-    }
-    .calendario-eventos__item--recordatorio {
-      border-left: 6px solid var(--color-recordatorio);
-    }
-
-    /* Banda elegante en la tarjeta */
+    .calendario-eventos__item--festivo { border-left: 6px solid var(--color-festivo); }
+    .calendario-eventos__item--falla { border-left: 6px solid var(--color-falla); }
+    .calendario-eventos__item--evento { border-left: 6px solid var(--color-evento); }
+    .calendario-eventos__item--urgente { border-left: 6px solid var(--color-urgente); }
+    .calendario-eventos__item--informacion { border-left: 6px solid var(--color-informacion); color: #000; }
+    .calendario-eventos__item--recordatorio { border-left: 6px solid var(--color-recordatorio); }
     .calendario-eventos__banda {
       height: 4px;
       width: 100%;
@@ -416,15 +335,9 @@
       margin-bottom: 0.5rem;
     }
 
-    /* Modo Sencillo / Avanzado */
-    .modo-sencillo .avanzado {
-      display: none;
-    }
+    .modo-sencillo .avanzado { display: none; }
 
-    /* Modal ICS */
-    .ics-modal.oculto {
-      display: none;
-    }
+    .ics-modal.oculto { display: none; }
     .ics-modal {
       position: fixed;
       z-index: 9999;
@@ -455,9 +368,7 @@
       color: var(--color-festivo);
       cursor: pointer;
     }
-    .ics-modal__cerrar:hover {
-      color: #444;
-    }
+    .ics-modal__cerrar:hover { color: #444; }
     .ics-modal__titulo {
       margin-top: 0;
       margin-bottom: 1rem;
@@ -504,49 +415,30 @@
       width: auto;
       text-align: center;
     }
-    .ics-modal__boton:hover {
-      background-color: #444;
-    }
+    .ics-modal__boton:hover { background-color: #444; }
     @media (max-width: 768px) {
-      .ics-modal__boton {
-        width: 100%;
-        margin: 0;
-      }
+      .ics-modal__boton { width: 100%; margin: 0; }
     }
 
-    /* ===================================================
-       Media Queries Agrupadas (Pantallas mayores)
-    =================================================== */
     @media (min-width: 481px) and (max-width: 768px) {
-      .calendario-eventos__fila {
-        grid-template-columns: repeat(2, minmax(150px, 1fr));
-      }
-      .calendario-eventos__lista {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .calendario-eventos__fila { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+      .calendario-eventos__lista { grid-template-columns: repeat(2, 1fr); }
     }
     @media (min-width: 769px) and (max-width: 1023px) {
-      .calendario-eventos__fila {
-        grid-template-columns: repeat(3, minmax(150px, 1fr));
-      }
-      .calendario-eventos__lista {
-        grid-template-columns: repeat(3, 1fr);
-      }
+      .calendario-eventos__fila { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
+      .calendario-eventos__lista { grid-template-columns: repeat(3, 1fr); }
     }
     @media (min-width: 1024px) {
       .calendario-eventos__fila {
         grid-template-columns: repeat(4, minmax(150px, 1fr));
         gap: 2rem;
       }
-      .calendario-eventos__lista {
-        grid-template-columns: repeat(4, 1fr);
-      }
+      .calendario-eventos__lista { grid-template-columns: repeat(4, 1fr); }
     }
   </style>
 </head>
 <body>
   <div class="calendario-eventos modo-sencillo" id="calendarioContenedor">
-    <!-- Acciones: Botones de quitar filtros y alternar modo -->
     <div class="calendario-eventos__acciones">
       <button class="calendario-eventos__boton-quitar" id="botonQuitarFiltros">Quitar Filtros (Alt+R)</button>
       <button class="calendario-eventos__modo-boton" id="botonModo">Cambiar a Modo Avanzado</button>
@@ -554,7 +446,6 @@
     <header class="calendario-eventos__cabecera">
       <h1 class="calendario-eventos__cabecera-titulo">Calendario de Eventos</h1>
     </header>
-    <!-- Controles de filtrado -->
     <div class="calendario-eventos__controles">
       <div class="calendario-eventos__fila fila-basica">
         <div class="calendario-eventos__control">
@@ -615,14 +506,12 @@
       </div>
     </div>
     <div class="calendario-eventos__leyenda" id="info-mes"></div>
-    <div class="calendario-eventos__mini" id="mini-calendario">
-      <!-- Se genera dinámicamente -->
-    </div>
+    <div class="calendario-eventos__mini" id="mini-calendario"></div>
     <div class="calendario-eventos__detalles-mes" id="descripcion-eventos-mes"></div>
     <div class="calendario-eventos__lista" id="lista-anuncios"></div>
   </div>
 
-  <!-- MODAL ICS (oculto por defecto) -->
+  <!-- Modal ICS -->
   <div id="icsModal" class="ics-modal oculto">
     <div class="ics-modal__contenido">
       <button class="ics-modal__cerrar" id="icsCerrarBtn">×</button>
@@ -639,13 +528,13 @@
     </div>
   </div>
 
-  <!-- Flatpickr JS -->
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
     /********************************************
-     * Datos COMPLETOS
+     * Datos COMPLETOS (Eventos)
      ********************************************/
     const eventos = [
+      // Eventos 2025
       { id: 1, title: "Año Nuevo", description: "Celebración del Año Nuevo", date: "2025-01-01", category: "Festivo" },
       { id: 2, title: "Epifanía del Señor", description: "Celebración de la Epifanía", date: "2025-01-06", category: "Festivo" },
       { id: 3, title: "San Vicente Mártir", description: "Festividad en honor a San Vicente", date: "2025-01-22", category: "Festivo" },
@@ -671,6 +560,8 @@
       { id: 23, title: "Aviso Urgente", description: "Aviso urgente para todos", date: "2025-04-05", category: "Urgente" },
       { id: 24, title: "Información Importante", description: "Información relevante sobre el evento", date: "2025-04-07", category: "Informacion" },
       { id: 25, title: "Recordatorio", description: "Recordatorio de evento", date: "2025-04-09", category: "Recordatorio" },
+
+      // Eventos 2026
       { id: 26, title: "Año Nuevo", description: "Celebración del Año Nuevo", date: "2026-01-01", category: "Festivo" },
       { id: 27, title: "Epifanía del Señor", description: "Celebración de la Epifanía", date: "2026-01-06", category: "Festivo" },
       { id: 28, title: "San Vicente Mártir", description: "Festividad en honor a San Vicente", date: "2026-01-22", category: "Festivo" },
@@ -694,11 +585,11 @@
       { id: 46, title: "San Valentín", description: "Día de San Valentín", date: "2026-02-14", category: "Evento" },
       { id: 47, title: "Día Internacional de la Mujer", description: "Celebración del Día Internacional de la Mujer", date: "2026-03-08", category: "Evento" }
     ];
-    
+
     const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-    
+
     /********************************************
-     * Configurar Flatpickr para el rango
+     * Configurar Flatpickr (Rango de Fechas)
      ********************************************/
     flatpickr("#filtro-rango-fecha", {
       mode: "range",
@@ -719,26 +610,15 @@
         actualizarVista();
       }
     });
-    
+
     /********************************************
-     * Funciones para convertir fechas
+     * Funciones para convertir fechas y filtrar
      ********************************************/
     function toDateObj(str) {
       if (!str || !/^\d{4}-\d{2}-\d{2}$/.test(str)) return null;
       const [yyyy, mm, dd] = str.split("-").map(Number);
       return new Date(yyyy, mm - 1, dd);
     }
-    function toDateDMY(str) {
-      const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
-      const match = str.match(regex);
-      if (!match) return null;
-      const [_, dd, mm, yyyy] = match;
-      return new Date(+yyyy, +mm - 1, +dd);
-    }
-    
-    /********************************************
-     * Función: cumpleRango
-     ********************************************/
     function cumpleRango(eDateStr, iniDate, finDate) {
       const eDate = toDateObj(eDateStr);
       if (!eDate) return false;
@@ -746,9 +626,9 @@
       if (finDate && eDate > finDate) return false;
       return true;
     }
-    
+
     /********************************************
-     * Integración con mini calendario
+     * Función: actualizarFiltrosConCelda
      ********************************************/
     function actualizarFiltrosConCelda(celda, dia, mes, anio) {
       const diaStr = String(dia).padStart(2, "0");
@@ -758,20 +638,11 @@
       document.getElementById('filtro-ano').value = String(anio);
       actualizarVista();
     }
-    function resaltarCeldaSeleccionada(celda) {
-      const celdas = document.querySelectorAll('.calendario-eventos__mini-dia');
-      celdas.forEach(el => el.classList.remove('seleccionado'));
-      celda.classList.add('seleccionado');
-      setTimeout(() => {
-        celda.classList.remove('seleccionado');
-      }, 500);
-    }
-    
+
     /********************************************
-     * Función auxiliar: obtener el color de mayor prioridad
+     * Funciones auxiliares: prioridad y selección
      ********************************************/
     function getPriorityColorForEvents(eventsArray) {
-      // Prioridad: Urgente > Recordatorio > Informacion > Festivo > Falla > Evento
       const categoryPriority = {
         "Urgente": 1,
         "Recordatorio": 2,
@@ -799,27 +670,45 @@
       });
       return bestColor;
     }
-    
+
+    function getPriorityEvent(eventsArray) {
+      const categoryPriority = {
+        "Urgente": 1,
+        "Recordatorio": 2,
+        "Informacion": 3,
+        "Festivo": 4,
+        "Falla": 5,
+        "Evento": 6
+      };
+      let selectedEvent = eventsArray[0];
+      eventsArray.forEach(ev => {
+        if (categoryPriority[ev.category] < categoryPriority[selectedEvent.category]) {
+          selectedEvent = ev;
+        }
+      });
+      return selectedEvent;
+    }
+
     /********************************************
-     * Optimización de la generación del mini calendario
+     * Creación del Mini Calendario
      ********************************************/
     function calcularOffset(mes, anio) {
       const primerDia = new Date(anio, mes, 1).getDay();
       return (primerDia === 0) ? 6 : primerDia - 1;
     }
+
     function crearCeldaDia(d, mes, anio, eventosDelDia) {
       const celda = document.createElement('div');
       celda.className = 'calendario-eventos__mini-dia';
       celda.textContent = d;
+      
       if (eventosDelDia.length > 0) {
-        // Siempre se añade un pequeño indicador (dot) con el color correspondiente
         const dot = document.createElement('span');
         dot.className = 'calendario-eventos__mini-indicador';
         dot.style.backgroundColor = getPriorityColorForEvents(eventosDelDia);
         celda.appendChild(dot);
       }
       if (eventosDelDia.length > 1) {
-        // Si hay 2 o más eventos, además se añade una banda en la parte inferior
         const banda = document.createElement('div');
         banda.className = 'calendario-eventos__mini-banda';
         banda.style.backgroundColor = getPriorityColorForEvents(eventosDelDia);
@@ -831,22 +720,33 @@
         tooltip.textContent = eventosDelDia.map(e => e.title).join(", ");
         celda.appendChild(tooltip);
       }
+      
       celda.addEventListener('click', () => {
         actualizarFiltrosConCelda(celda, d, mes, anio);
         resaltarCeldaSeleccionada(celda);
         const dateObj = new Date(anio, mes, d);
         const dayName = obtenerNombreDia(dateObj);
+        
+        let prefillEvent = { eventTitle: "", notes: "" };
+        if (eventosDelDia.length > 0) {
+          const priorityEvent = getPriorityEvent(eventosDelDia);
+          prefillEvent.eventTitle = priorityEvent.title;
+          prefillEvent.notes = priorityEvent.description;
+        }
+        console.log("Abriendo modal para el día:", d, "con evento:", prefillEvent);
         abrirICSModal({
           date: d,
           dayName: dayName,
-          eventTitle: "",
+          eventTitle: prefillEvent.eventTitle,
           startTime: "00:00",
           endTime: "23:59",
-          notes: ""
+          notes: prefillEvent.notes
         });
       });
+      
       return celda;
     }
+
     function construirCuadricula(mes, anio, eventosFiltrados) {
       const fragment = document.createDocumentFragment();
       const diasSemana = ["L", "M", "X", "J", "V", "S", "D"];
@@ -875,6 +775,7 @@
       }
       return fragment;
     }
+
     function generarMiniCalendario(mes, anio, eventosFiltrados) {
       const contenedor = document.getElementById('mini-calendario');
       contenedor.style.opacity = 0;
@@ -885,19 +786,31 @@
         contenedor.style.opacity = 1;
       }, 100);
     }
-    
+
+    /********************************************
+     * Función: resaltarCeldaSeleccionada
+     ********************************************/
+    function resaltarCeldaSeleccionada(celda) {
+      const celdas = document.querySelectorAll('.calendario-eventos__mini-dia');
+      celdas.forEach(el => el.classList.remove('seleccionado'));
+      celda.classList.add('seleccionado');
+      setTimeout(() => {
+        celda.classList.remove('seleccionado');
+      }, 500);
+    }
+
     /********************************************
      * Filtrar eventos
      ********************************************/
     function filtrarEventos() {
-      const busqueda = document.getElementById('filtro-busqueda').value.trim().toLowerCase();
-      const categoria = document.getElementById('filtro-categoria').value.trim();
+      const busqueda     = document.getElementById('filtro-busqueda').value.trim().toLowerCase();
+      const categoria    = document.getElementById('filtro-categoria').value.trim();
       const fechaPuntual = document.getElementById('filtro-fecha').value.trim();
-      const diaFiltro = document.getElementById('filtro-dia').value.trim();
-      const mesFiltro = document.getElementById('filtro-mes').value.trim();
-      const anoFiltro = document.getElementById('filtro-ano').value.trim();
-      const rangoStr = document.getElementById('filtro-rango-fecha').value.trim();
-    
+      const diaFiltro    = document.getElementById('filtro-dia').value.trim();
+      const mesFiltro    = document.getElementById('filtro-mes').value.trim();
+      const anoFiltro    = document.getElementById('filtro-ano').value.trim();
+      const rangoStr     = document.getElementById('filtro-rango-fecha').value.trim();
+
       if (!busqueda && !categoria && !fechaPuntual && !diaFiltro && !mesFiltro && !anoFiltro && !rangoStr) {
         return [];
       }
@@ -912,7 +825,7 @@
         let coincide = true;
         if (busqueda) {
           const titulo = e.title.toLowerCase();
-          const desc = e.description.toLowerCase();
+          const desc   = e.description.toLowerCase();
           if (!titulo.includes(busqueda) && !desc.includes(busqueda)) {
             coincide = false;
           }
@@ -952,12 +865,12 @@
         return coincide;
       });
     }
-    
+
     function actualizarLeyenda(mes, anio) {
       const infoMes = document.getElementById('info-mes');
       infoMes.textContent = `Mostrando eventos de ${MESES[mes]} ${anio}`;
     }
-    
+
     function mostrarDescripcionMes(eventosDelMes, mes, anio) {
       const contenedor = document.getElementById('descripcion-eventos-mes');
       contenedor.innerHTML = '';
@@ -979,15 +892,12 @@
       });
       contenedor.appendChild(ul);
     }
-    
-    /********************************************
-     * obtenerNombreDia
-     ********************************************/
+
     function obtenerNombreDia(dateObj) {
       const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
       return dias[dateObj.getDay()];
     }
-    
+
     /********************************************
      * Renderizar lista de eventos (Tarjetas)
      ********************************************/
@@ -1002,7 +912,6 @@
         document.getElementById('btn-reset-filtros').addEventListener('click', resetearFiltros);
         return;
       }
-      // Mapeo de categorías a colores según prioridad
       const mapping = {
         "Urgente": "#C13584",
         "Recordatorio": "#000080",
@@ -1028,7 +937,6 @@
         }
         const div = document.createElement('div');
         div.className = `calendario-eventos__item ${claseModificador}`;
-        // Agregar banda elegante en la parte superior
         const banda = document.createElement('div');
         banda.className = 'calendario-eventos__banda';
         banda.style.backgroundColor = mapping[e.category] || "#000";
@@ -1057,9 +965,9 @@
         lista.appendChild(div);
       });
     }
-    
+
     /********************************************
-     * actualizarVista
+     * Actualizar Vista
      ********************************************/
     function actualizarVista() {
       const filtrados = filtrarEventos();
@@ -1079,9 +987,9 @@
       mostrarDescripcionMes(eventosEsteMes, mes, anio);
       generarMiniCalendario(mes, anio, filtrados);
     }
-    
+
     /********************************************
-     * resetearFiltros
+     * Resetear Filtros
      ********************************************/
     function resetearFiltros() {
       document.getElementById('filtro-busqueda').value = '';
@@ -1095,9 +1003,9 @@
       document.getElementById('filtro-ano').value = '';
       actualizarVista();
     }
-    
+
     /********************************************
-     * toggleModo
+     * Toggle Modo
      ********************************************/
     function toggleModo() {
       const contenedor = document.getElementById('calendarioContenedor');
@@ -1112,18 +1020,18 @@
         boton.textContent = "Cambiar a Modo Avanzado";
       }
     }
-    
+
     /********************************************
-     * manejarAtajos (Alt+R)
+     * Manejar Atajos (Alt+R)
      ********************************************/
     function manejarAtajos(e) {
       if (e.altKey && e.key.toLowerCase() === 'r') {
         resetearFiltros();
       }
     }
-    
+
     /********************************************
-     * asignarEventos
+     * Asignar Eventos
      ********************************************/
     function asignarEventos() {
       const controles = document.querySelectorAll(
@@ -1159,21 +1067,22 @@
       document.getElementById('botonModo').addEventListener('click', toggleModo);
       document.addEventListener('keydown', manejarAtajos);
     }
-    
+
     /********************************************
-     * MODAL ICS: Variables y funciones
+     * Modal ICS
      ********************************************/
     const icsModal = document.getElementById('icsModal');
     const icsCerrarBtn = document.getElementById('icsCerrarBtn');
     const icsAceptarBtn = document.getElementById('icsAceptarBtn');
-    
+
     const icsModalTitulo = document.getElementById('icsModalTitulo');
     const icsEventoInput = document.getElementById('icsEvento');
     const icsHoraInicio = document.getElementById('icsHoraInicio');
     const icsHoraFin = document.getElementById('icsHoraFin');
     const icsNotas = document.getElementById('icsNotas');
-    
+
     function abrirICSModal({ date, dayName, eventTitle, startTime, endTime, notes }) {
+      console.log("abrirICSModal ->", { date, dayName, eventTitle, notes });
       icsModalTitulo.textContent = `Día ${date} (${dayName})`;
       icsEventoInput.value = eventTitle || "";
       icsHoraInicio.value = startTime || "00:00";
@@ -1181,11 +1090,12 @@
       icsNotas.value = notes || "";
       icsModal.classList.remove('oculto');
     }
+
     function cerrarICSModal() {
       icsModal.classList.add('oculto');
     }
     icsCerrarBtn.addEventListener('click', cerrarICSModal);
-    
+
     icsAceptarBtn.addEventListener('click', () => {
       const titulo = icsModalTitulo.textContent;
       const [ , rawDay ] = titulo.split(" ");
@@ -1210,7 +1120,7 @@
       document.body.removeChild(a);
       cerrarICSModal();
     });
-    
+
     function generarICS({ dayLabel, eventTitle, startTime, endTime, notes }) {
       const fakeDate = new Date(2025, 2, 18);
       const dtStamp = formatearFechaICS(new Date());
@@ -1231,6 +1141,7 @@ END:VEVENT
 END:VCALENDAR
       `.trim();
     }
+
     function formatearFechaICS(dateObj) {
       const year = dateObj.getFullYear();
       const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -1240,20 +1151,22 @@ END:VCALENDAR
       const seconds = String(dateObj.getSeconds()).padStart(2, '0');
       return `${year}${month}${day}T${hours}${minutes}${seconds}`;
     }
+
     function combinarFechaHora(dateObj, hhmm) {
       const [hh, mm] = hhmm.split(':').map(Number);
       const newDate = new Date(dateObj);
       newDate.setHours(hh || 0, mm || 0, 0, 0);
       return newDate;
     }
+
     function limpiarICS(str) {
       return (str || "")
         .replace(/(\r\n|\r|\n)/g, "\\n")
         .replace(/,/g, "\\,");
     }
-    
+
     /********************************************
-     * iniciar
+     * Iniciar
      ********************************************/
     function iniciar() {
       asignarEventos();
