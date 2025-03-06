@@ -280,7 +280,16 @@
       padding: 2px 5px;
       font-size: 0.7rem;
     }
-    /* Si hay 2 o más eventos en un día, se muestra una banda de color en la celda */
+    /* Indicador (dot) en la celda para cualquier día con evento */
+    .calendario-eventos__mini-indicador {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    /* Banda elegante: si hay 2 o más eventos, se agrega una banda inferior */
     .calendario-eventos__mini-banda {
       position: absolute;
       bottom: 0;
@@ -289,6 +298,7 @@
       height: 4px;
       border-radius: 0 0 4px 4px;
     }
+    /* Colores para la celda según categoría */
     .calendario-eventos__mini-dia.mini-festivo {
       background-color: var(--color-festivo);
       color: #fff;
@@ -298,7 +308,7 @@
       color: #fff;
     }
     .calendario-eventos__mini-dia.mini-evento {
-      background-color: #4A4A4A;
+      background-color: var(--color-evento);
       color: #fff;
     }
     .calendario-eventos__mini-dia.mini-urgente {
@@ -343,7 +353,7 @@
       outline: 2px solid blue;
     }
 
-    /* Lista de eventos (tarjetas) */
+    /* Lista de eventos (Tarjetas) */
     .calendario-eventos__lista {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -377,7 +387,7 @@
       display: flex;
       justify-content: space-between;
     }
-    /* Aquí se mantienen las clases para la asignación previa por categoría si fuera necesario */
+    /* Clases para bordes laterales según categoría (si se quiere mantener) */
     .calendario-eventos__item--festivo {
       border-left: 6px solid var(--color-festivo);
     }
@@ -385,7 +395,7 @@
       border-left: 6px solid var(--color-falla);
     }
     .calendario-eventos__item--evento {
-      border-left: 6px solid #4A4A4A;
+      border-left: 6px solid var(--color-evento);
     }
     .calendario-eventos__item--urgente {
       border-left: 6px solid var(--color-urgente);
@@ -422,7 +432,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: rgba(0,0,0,0.5);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -801,12 +811,18 @@
       const celda = document.createElement('div');
       celda.className = 'calendario-eventos__mini-dia';
       celda.textContent = d;
+      if (eventosDelDia.length > 0) {
+        // Siempre se añade un pequeño indicador (dot) con el color correspondiente
+        const dot = document.createElement('span');
+        dot.className = 'calendario-eventos__mini-indicador';
+        dot.style.backgroundColor = getPriorityColorForEvents(eventosDelDia);
+        celda.appendChild(dot);
+      }
       if (eventosDelDia.length > 1) {
-        // Agregar banda de color según prioridad
-        const bestColor = getPriorityColorForEvents(eventosDelDia);
+        // Si hay 2 o más eventos, además se añade una banda en la parte inferior
         const banda = document.createElement('div');
         banda.className = 'calendario-eventos__mini-banda';
-        banda.style.backgroundColor = bestColor;
+        banda.style.backgroundColor = getPriorityColorForEvents(eventosDelDia);
         celda.appendChild(banda);
       }
       if (eventosDelDia.length > 0) {
@@ -986,7 +1002,7 @@
         document.getElementById('btn-reset-filtros').addEventListener('click', resetearFiltros);
         return;
       }
-      // Mapeo de categorías a colores según la prioridad
+      // Mapeo de categorías a colores según prioridad
       const mapping = {
         "Urgente": "#C13584",
         "Recordatorio": "#000080",
@@ -1012,7 +1028,7 @@
         }
         const div = document.createElement('div');
         div.className = `calendario-eventos__item ${claseModificador}`;
-        // Agregar una banda elegante en la parte superior con el color asignado
+        // Agregar banda elegante en la parte superior
         const banda = document.createElement('div');
         banda.className = 'calendario-eventos__banda';
         banda.style.backgroundColor = mapping[e.category] || "#000";
