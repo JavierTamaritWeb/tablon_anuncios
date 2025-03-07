@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calendario de Eventos - Falla Suïssa</title>
+  <title>Agenda de Eventos - Falla Suïssa</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
     :root {
@@ -150,33 +150,23 @@
     }
     /* Estilo inicial del placeholder */
     .calendario-eventos__control-texto::placeholder {
-      
       transition: color 0.3s ease;
     }
-
     .calendario-eventos__control-texto:hover::placeholder {
-      color: #fff; /* Ejemplo: rojo */
+      color: #fff;
     }
-
     .calendario-eventos__control-fecha::placeholder {
-      
       transition: color 0.3s ease;
     }
     .calendario-eventos__control-fecha:hover::placeholder {
-      color: #fff; /* Ejemplo: rojo */
+      color: #fff;
     }
-
-
- 
     .calendario-eventos__control-busqueda::placeholder {
-      
       transition: color 0.3s ease;
     }
     .calendario-eventos__control-busqueda:hover::placeholder {
-      color: #fff; /* Ejemplo: rojo */
+      color: #fff;
     }
-
-
     .calendario-eventos__control-fecha-wrapper {
       position: relative;
       display: flex;
@@ -211,16 +201,12 @@
     .calendario-eventos__control-fecha-wrapper:hover .calendario-eventos__control-fecha-borrar {
       color: #fff;
     }
-
-
     .calendario-eventos__control-texto {
       transition: color 300ms ease;
     }
     .calendario-eventos__control-texto:hover {
       color: #fff;
     }
-
-
     .calendario-eventos__leyenda {
       margin: var(--espaciado) 0;
       font-size: 1.2rem;
@@ -246,7 +232,6 @@
       list-style: disc;
     }
     .calendario-eventos__detalles-mes li { margin-bottom: 0.5rem; }
-
     /* MINI CALENDARIO */
     .calendario-eventos__mini {
       margin: var(--espaciado) 0;
@@ -328,7 +313,6 @@
       visibility: visible;
       opacity: 1;
     }
-
     /* LISTA DE EVENTOS (Tarjetas) */
     .calendario-eventos__lista {
       display: grid;
@@ -375,9 +359,7 @@
       border-radius: 4px 4px 0 0;
       margin-bottom: 0.5rem;
     }
-
     .modo-sencillo .avanzado { display: none; }
-
     .ics-modal.oculto { display: none; }
     .ics-modal {
       position: fixed;
@@ -460,7 +442,6 @@
     @media (max-width: 768px) {
       .ics-modal__boton { width: 100%; margin: 0; }
     }
-
     @media (min-width: 481px) and (max-width: 768px) {
       .calendario-eventos__fila { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
       .calendario-eventos__lista { grid-template-columns: repeat(2, 1fr); }
@@ -488,6 +469,7 @@
       <h1 class="calendario-eventos__cabecera-titulo">Agenda de Eventos</h1>
     </header>
     <div class="calendario-eventos__controles">
+      <!-- Aquí se incluyen los controles y demás elementos de la interfaz -->
       <div class="calendario-eventos__fila fila-basica">
         <div class="calendario-eventos__control">
           <label for="filtro-busqueda">Buscar</label>
@@ -571,64 +553,24 @@
 
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script>
+    // Cargar las variables "eventos" y "MESES" desde el JSON para mayor mantenibilidad.
+    document.addEventListener('DOMContentLoaded', function() {
+      fetch('data/eventos.json')
+        .then(response => response.json())
+        .then(data => {
+          window.eventos = data.eventos;
+          window.MESES = data.MESES;
+          iniciar();
+        })
+        .catch(err => {
+          console.error('Error loading eventos.json', err);
+          iniciar();
+        });
+    });
+
     /********************************************
-     * Datos COMPLETOS (Eventos)
+     * Funciones y lógica de la agenda de eventos
      ********************************************/
-    const eventos = [
-      // Eventos 2025
-      { id: 1, title: "Año Nuevo", description: "Celebración del Año Nuevo", date: "2025-01-01", category: "Festivo" },
-      { id: 2, title: "Epifanía del Señor", description: "Celebración de la Epifanía", date: "2025-01-06", category: "Festivo" },
-      { id: 3, title: "San Vicente Mártir", description: "Festividad en honor a San Vicente", date: "2025-01-22", category: "Festivo" },
-      { id: 4, title: "San José", description: "Festividad en honor a San José", date: "2025-03-19", category: "Festivo" },
-      { id: 5, title: "Viernes Santo", description: "Celebración del Viernes Santo", date: "2025-04-18", category: "Festivo" },
-      { id: 6, title: "Lunes de Pascua", description: "Celebración del Lunes de Pascua", date: "2025-04-21", category: "Festivo" },
-      { id: 7, title: "San Vicente Ferrer", description: "Festividad en honor a San Vicente Ferrer", date: "2025-04-28", category: "Festivo" },
-      { id: 8, title: "Fiesta del Trabajo", description: "Celebración del Día del Trabajo", date: "2025-05-01", category: "Festivo" },
-      { id: 9, title: "San Juan", description: "Festividad en honor a San Juan", date: "2025-06-24", category: "Festivo" },
-      { id: 10, title: "Asunción de la Virgen", description: "Celebración de la Asunción", date: "2025-08-15", category: "Festivo" },
-      { id: 11, title: "Día de la C. Valenciana", description: "Fiesta de la Comunidad Valenciana", date: "2025-10-09", category: "Festivo" },
-      { id: 12, title: "Todos los Santos", description: "Festividad de Todos los Santos", date: "2025-11-01", category: "Festivo" },
-      { id: 13, title: "Día de la Constitución", description: "Celebración de la Constitución", date: "2025-12-06", category: "Festivo" },
-      { id: 14, title: "Inmaculada Concepción", description: "Celebración de la Inmaculada Concepción", date: "2025-12-08", category: "Festivo" },
-      { id: 15, title: "Navidad", description: "Celebración de la Navidad", date: "2025-12-25", category: "Festivo" },
-      { id: 16, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-15", category: "Falla" },
-      { id: 17, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-16", category: "Falla" },
-      { id: 18, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-17", category: "Falla" },
-      { id: 19, title: "Fallas", description: "Celebración de Fallas", date: "2025-03-18", category: "Falla" },
-      { id: 20, title: "San José", description: "Festividad y Fallas", date: "2025-03-19", category: "Falla" },
-      { id: 21, title: "San Valentín", description: "Día de San Valentín", date: "2025-02-14", category: "Evento" },
-      { id: 22, title: "Día Internacional de la Mujer", description: "Celebración del Día Internacional de la Mujer", date: "2025-03-08", category: "Evento" },
-      { id: 23, title: "Aviso Urgente", description: "Aviso urgente para todos", date: "2025-04-05", category: "Urgente" },
-      { id: 24, title: "Información Importante", description: "Información relevante sobre el evento", date: "2025-04-07", category: "Informacion" },
-      { id: 25, title: "Recordatorio", description: "Recordatorio de evento", date: "2025-04-09", category: "Recordatorio" },
-
-      // Eventos 2026
-      { id: 26, title: "Año Nuevo", description: "Celebración del Año Nuevo", date: "2026-01-01", category: "Festivo" },
-      { id: 27, title: "Epifanía del Señor", description: "Celebración de la Epifanía", date: "2026-01-06", category: "Festivo" },
-      { id: 28, title: "San Vicente Mártir", description: "Festividad en honor a San Vicente", date: "2026-01-22", category: "Festivo" },
-      { id: 29, title: "San José", description: "Festividad en honor a San José", date: "2026-03-19", category: "Festivo" },
-      { id: 30, title: "Viernes Santo", description: "Celebración del Viernes Santo", date: "2026-04-03", category: "Festivo" },
-      { id: 31, title: "Lunes de Pascua", description: "Celebración del Lunes de Pascua", date: "2026-04-06", category: "Festivo" },
-      { id: 32, title: "San Vicente Ferrer", description: "Festividad en honor a San Vicente Ferrer", date: "2026-04-28", category: "Festivo" },
-      { id: 33, title: "Fiesta del Trabajo", description: "Celebración del Día del Trabajo", date: "2026-05-01", category: "Festivo" },
-      { id: 34, title: "San Juan", description: "Festividad en honor a San Juan", date: "2026-06-24", category: "Festivo" },
-      { id: 35, title: "Asunción de la Virgen", description: "Celebración de la Asunción", date: "2026-08-15", category: "Festivo" },
-      { id: 36, title: "Día de la C. Valenciana", description: "Fiesta de la Comunidad Valenciana", date: "2026-10-09", category: "Festivo" },
-      { id: 37, title: "Todos los Santos", description: "Festividad de Todos los Santos", date: "2026-11-01", category: "Festivo" },
-      { id: 38, title: "Día de la Constitución", description: "Celebración de la Constitución", date: "2026-12-06", category: "Festivo" },
-      { id: 39, title: "Inmaculada Concepción", description: "Celebración de la Inmaculada Concepción", date: "2026-12-08", category: "Festivo" },
-      { id: 40, title: "Navidad", description: "Celebración de la Navidad", date: "2026-12-25", category: "Festivo" },
-      { id: 41, title: "Fallas", description: "Celebración de Fallas", date: "2026-03-15", category: "Falla" },
-      { id: 42, title: "Fallas", description: "Celebración de Fallas", date: "2026-03-16", category: "Falla" },
-      { id: 43, title: "Fallas", description: "Celebración de Fallas", date: "2026-03-17", category: "Falla" },
-      { id: 44, title: "Fallas", description: "Celebración de Fallas", date: "2026-03-18", category: "Falla" },
-      { id: 45, title: "San José", description: "Festividad y Fallas", date: "2026-03-19", category: "Falla" },
-      { id: 46, title: "San Valentín", description: "Día de San Valentín", date: "2026-02-14", category: "Evento" },
-      { id: 47, title: "Día Internacional de la Mujer", description: "Celebración del Día Internacional de la Mujer", date: "2026-03-08", category: "Evento" }
-    ];
-
-    const MESES = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
-
     /********************************************
      * Configurar Flatpickr (Rango de Fechas)
      ********************************************/
@@ -1213,7 +1155,6 @@ END:VCALENDAR
       asignarEventos();
       actualizarVista();
     }
-    document.addEventListener('DOMContentLoaded', iniciar);
   </script>
 </body>
 </html>
